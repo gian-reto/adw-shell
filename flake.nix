@@ -1,5 +1,5 @@
 {
-  description = "My Awesome Desktop Shell";
+  description = "AGS-based shell in default libadwaita style";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
@@ -17,13 +17,21 @@
   }: let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
-    pname = "my-shell";
+    pname = "adw-shell";
     entry = "app.ts";
 
     astalPackages = with ags.packages.${system}; [
+      apps
+      astal4
+      battery
+      bluetooth
+      hyprland
       io
-      astal4 # or astal3 for gtk3
-      # notifd tray wireplumber
+      mpris
+      network
+      notifd
+      tray
+      wireplumber
     ];
 
     extraPackages =
@@ -65,6 +73,9 @@
           (ags.packages.${system}.default.override {
             inherit extraPackages;
           })
+          pkgs.biome
+          pkgs.nodejs
+          pkgs.typescript
         ];
       };
     };
