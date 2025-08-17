@@ -24,7 +24,7 @@
 
     mkExtraPackagesFor = system: let
       pkgs = pkgsFor system;
-      
+
       astalPackages = with ags.packages.${system}; [
         apps
         astal4
@@ -57,6 +57,7 @@
           wrapGAppsHook
           gobject-introspection
           ags.packages.${system}.default
+          makeWrapper
         ];
 
         buildInputs = extraPackages ++ [pkgs.gjs];
@@ -68,6 +69,12 @@
           mkdir -p $out/share
           cp -r * $out/share
           ags bundle ${entry} $out/bin/${pname} -d "SRC='$out/share'"
+
+          wrapProgram $out/bin/${pname} \
+            --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
+            # Runtime dependencies.
+            dart-sass
+          ])}
 
           runHook postInstall
         '';
@@ -84,6 +91,7 @@
             inherit extraPackages;
           })
           pkgs.biome
+          pkgs.dart-sass
           pkgs.nodejs
           pkgs.typescript
         ];
