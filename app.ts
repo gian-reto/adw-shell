@@ -7,6 +7,7 @@ import app from "ags/gtk4/app";
 import { getStylesheet } from "./theme";
 
 app.start({
+  instanceName: "adw-shell",
   css: getStylesheet("adwaita-dark"),
   main() {
     app.get_monitors().map((monitor) =>
