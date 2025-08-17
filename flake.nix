@@ -15,33 +15,40 @@
     nixpkgs,
     ags,
   }: let
-    system = "x86_64-linux";
-    pkgs = nixpkgs.legacyPackages.${system};
     pname = "adw-shell";
     entry = "app.ts";
 
-    astalPackages = with ags.packages.${system}; [
-      apps
-      astal4
-      battery
-      bluetooth
-      hyprland
-      io
-      mpris
-      network
-      notifd
-      tray
-      wireplumber
-    ];
+    supportedSystems = ["x86_64-linux" "aarch64-linux"];
+    forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+    pkgsFor = system: nixpkgs.legacyPackages.${system};
 
-    extraPackages =
+    mkExtraPackagesFor = system: let
+      pkgs = pkgsFor system;
+      
+      astalPackages = with ags.packages.${system}; [
+        apps
+        astal4
+        battery
+        bluetooth
+        hyprland
+        io
+        mpris
+        network
+        notifd
+        tray
+        wireplumber
+      ];
+    in
       astalPackages
       ++ [
         pkgs.libadwaita
         pkgs.libsoup_3
       ];
-  in {
-    packages.${system} = {
+
+    mkPackagesFor = system: let
+      pkgs = pkgsFor system;
+      extraPackages = mkExtraPackagesFor system;
+    in {
       default = pkgs.stdenv.mkDerivation {
         name = pname;
         src = ./.;
@@ -67,7 +74,10 @@
       };
     };
 
-    devShells.${system} = {
+    mkDevShellFor = system: let
+      pkgs = pkgsFor system;
+      extraPackages = mkExtraPackagesFor system;
+    in {
       default = pkgs.mkShell {
         buildInputs = [
           (ags.packages.${system}.default.override {
@@ -79,5 +89,8 @@
         ];
       };
     };
+  in {
+    packages = forAllSystems mkPackagesFor;
+    devShells = forAllSystems mkDevShellFor;
   };
 }
