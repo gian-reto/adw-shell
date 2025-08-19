@@ -1,13 +1,12 @@
-import { For, createBinding, createComputed, createState } from "ags";
-
 import Apps from "gi://AstalApps";
+import { createBinding, createComputed, createState, For } from "ags";
 import { Gtk } from "ags/gtk4";
-import { GtkButtonProps } from "../../../../widgets/GtkButton";
-import { GtkRevealerProps } from "../../../../widgets/GtkRevealer";
-import { GtkScrolledWindow } from "../../../../widgets/GtkScrolledWindow";
 import { chunk } from "../../../../util/array";
 import { cx } from "../../../../util/cx";
 import { getIconFromNameOrPath } from "../../../../util/icon";
+import type { GtkButtonProps } from "../../../../widgets/GtkButton";
+import type { GtkRevealerProps } from "../../../../widgets/GtkRevealer";
+import { GtkScrolledWindow } from "../../../../widgets/GtkScrolledWindow";
 
 export type AppGridProps = GtkRevealerProps & {
   /**
@@ -30,8 +29,8 @@ export const AppGrid = (props: AppGridProps) => {
   const chunkedSortedApps = createComputed([appsList, clickCount], (value) =>
     chunk(
       value.sort((a, b) => b.frequency - a.frequency),
-      6
-    )
+      6,
+    ),
   );
 
   return (
@@ -107,7 +106,7 @@ const AppGridItem = (props: AppGridItemProps) => {
     <button
       class={cx(
         "bg-transparent p-0 rounded-2xl hover:bg-gray-950",
-        classOverride
+        classOverride,
       )}
       tooltipText={app.name}
       onClicked={(self) => {

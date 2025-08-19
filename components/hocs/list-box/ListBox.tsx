@@ -1,9 +1,9 @@
-import { Accessor } from "ags";
+import type { Accessor } from "ags";
 import { Gtk } from "ags/gtk4";
-import { GtkBoxProps } from "../../../widgets/GtkBox";
-import { GtkListBoxProps } from "../../../widgets/GtkListBox";
-import { GtkListBoxRowProps } from "../../../widgets/GtkListBoxRow";
 import { cx } from "../../../util/cx";
+import type { GtkBoxProps } from "../../../widgets/GtkBox";
+import type { GtkListBoxProps } from "../../../widgets/GtkListBox";
+import type { GtkListBoxRowProps } from "../../../widgets/GtkListBoxRow";
 
 export type ListBoxProps = Omit<GtkBoxProps, "orientation"> &
   Pick<
@@ -81,7 +81,7 @@ const ListBoxItem = (props: ListBoxItemProps) => {
     <Gtk.ListBoxRow
       class={cx(
         "bg-gray-500 first-child:rounded-t-xl last-child:rounded-b-xl px-4 py-4",
-        classOverride
+        classOverride,
       )}
       {...restProps}
     >

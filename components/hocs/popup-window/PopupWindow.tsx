@@ -1,14 +1,13 @@
+import Graphene from "gi://Graphene";
 import { Accessor, createComputed, createState } from "ags";
 import { Astal, Gdk, Gtk } from "ags/gtk4";
-import { Position, positionToAlignment } from "../../../util/position";
-
-import Graphene from "gi://Graphene";
-import { GtkBoxProps } from "../../../widgets/GtkBox";
-import { GtkRevealerProps } from "../../../widgets/GtkRevealer";
-import { GtkWindowProps } from "../../../widgets/GtkWindow";
 import app from "ags/gtk4/app";
 import { cx } from "../../../util/cx";
+import { type Position, positionToAlignment } from "../../../util/position";
 import { unreachable } from "../../../util/unreachable";
+import type { GtkBoxProps } from "../../../widgets/GtkBox";
+import type { GtkRevealerProps } from "../../../widgets/GtkRevealer";
+import type { GtkWindowProps } from "../../../widgets/GtkWindow";
 
 export type PopupWindowProps = Omit<
   GtkWindowProps,
@@ -60,7 +59,7 @@ export const PopupWindow = (props: PopupWindowProps) => {
   // Handlers
   const handleKeyPressed = (
     _event: Gtk.EventControllerKey,
-    keyval: number
+    keyval: number,
   ): boolean => {
     if (keyval === Gdk.KEY_Escape) {
       windowRef.hide();
@@ -74,7 +73,7 @@ export const PopupWindow = (props: PopupWindowProps) => {
     _event: Gtk.GestureClick,
     _count: number,
     x: number,
-    y: number
+    y: number,
   ): boolean => {
     const [, rect] = contentBoxRef.compute_bounds(windowRef);
     const position = new Graphene.Point({ x, y });
@@ -157,7 +156,7 @@ const ContentBox = (props: ContentBoxProps) => {
       ? positionOverride
       : new Accessor(() => positionOverride);
   const alignment = createComputed([popupPosition], (value) =>
-    positionToAlignment(value)
+    positionToAlignment(value),
   );
   const halign = createComputed([alignment], (value) => value.halign);
   const valign = createComputed([alignment], (value) => value.valign);
@@ -183,7 +182,7 @@ const ContentBox = (props: ContentBoxProps) => {
 };
 
 const positionToRevealerTransitionType = (
-  position: Position
+  position: Position,
 ): Gtk.RevealerTransitionType => {
   switch (position) {
     case "center-bottom":
@@ -228,7 +227,7 @@ const PopupRevealer = (props: PopupRevealerProps) => {
 
   // State
   const transitionType = createComputed([popupPosition], (value) =>
-    positionToRevealerTransitionType(value)
+    positionToRevealerTransitionType(value),
   );
 
   return (

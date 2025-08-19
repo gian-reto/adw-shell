@@ -6,6 +6,6 @@ import { clamp } from "./number";
  */
 export const chunk = <T>(array: Array<T>, size: number): Array<Array<T>> => {
   return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
-    array.slice(i * size, clamp(i * size + size, 0, array.length))
+    array.slice(i * size, clamp(i * size + size, 0, array.length)),
   );
 };

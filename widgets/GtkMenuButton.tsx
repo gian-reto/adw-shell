@@ -1,5 +1,5 @@
-import { CCProps } from "ags";
-import { Gtk } from "ags/gtk4";
+import type { CCProps } from "ags";
+import type { Gtk } from "ags/gtk4";
 import { cx } from "../util/cx";
 
 export type GtkMenuButtonProps = CCProps<

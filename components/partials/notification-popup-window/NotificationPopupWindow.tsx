@@ -1,15 +1,14 @@
-import { Astal, Gtk } from "ags/gtk4";
-import { With, createComputed, createState, onCleanup } from "ags";
-
-import AstalIO from "gi://AstalIO";
-import { GtkScrolledWindow } from "../../../widgets/GtkScrolledWindow";
-import { GtkWindowProps } from "../../../widgets/GtkWindow";
+import type AstalIO from "gi://AstalIO";
 import Notifd from "gi://AstalNotifd";
-import { Notification } from "../../atoms/notification/Notification";
+import { createComputed, createState, onCleanup, With } from "ags";
+import { Astal, Gtk } from "ags/gtk4";
 import app from "ags/gtk4/app";
-import { calculateRegion } from "../../../util/region";
-import { cx } from "../../../util/cx";
 import { timeout } from "ags/time";
+import { cx } from "../../../util/cx";
+import { calculateRegion } from "../../../util/region";
+import { GtkScrolledWindow } from "../../../widgets/GtkScrolledWindow";
+import type { GtkWindowProps } from "../../../widgets/GtkWindow";
+import { Notification } from "../../atoms/notification/Notification";
 
 export type NotificationPopupWindowProps = Omit<
   GtkWindowProps,
@@ -29,7 +28,7 @@ export type NotificationPopupWindowProps = Omit<
 };
 
 export const NotificationPopupWindow = (
-  props: NotificationPopupWindowProps = {}
+  props: NotificationPopupWindowProps = {},
 ) => {
   // Props
   const {
@@ -59,7 +58,7 @@ export const NotificationPopupWindow = (
   >(undefined);
   const displayData = createComputed(
     [window, notification],
-    (...values) => values
+    (...values) => values,
   );
 
   // Handlers
@@ -166,7 +165,7 @@ export const NotificationPopupWindow = (
                   class={cx(
                     "min-w-96 shadow-xl shadow-black",
                     // Margins to prevent shadow clipping.
-                    "mx-6 mb-6"
+                    "mx-6 mb-6",
                   )}
                   notification={notification}
                   showRelativeTime

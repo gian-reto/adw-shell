@@ -1,5 +1,5 @@
-import GLib from "gi://GLib";
 import GdkPixbuf from "gi://GdkPixbuf";
+import GLib from "gi://GLib";
 
 /**
  * Normalize a home-relative (i.e., `~/...`) file path to the absolute
@@ -41,7 +41,7 @@ export const expandRelativeHomePathToAbsolute = (path: string): string => {
 export const isPathOfValidImage = (imgFilePath: string): boolean => {
   try {
     GdkPixbuf.Pixbuf.new_from_file(
-      expandRelativeHomePathToAbsolute(imgFilePath)
+      expandRelativeHomePathToAbsolute(imgFilePath),
     );
     return true;
   } catch (error) {

@@ -1,6 +1,5 @@
-import { Gdk, Gtk } from "ags/gtk4";
-
 import Gio from "gi://Gio";
+import { Gdk, Gtk } from "ags/gtk4";
 import { isPathOfValidImage } from "./path";
 
 /**
@@ -21,7 +20,7 @@ export const lookUpIcon = (
   name: string,
   scale: number,
   size = 64,
-  fallbackIconName: string = "image-missing-symbolic"
+  fallbackIconName: string = "image-missing-symbolic",
 ): Gtk.IconPaintable | undefined => {
   if (!name) return undefined;
   const display = Gdk.Display.get_default();
@@ -33,7 +32,7 @@ export const lookUpIcon = (
     size,
     scale,
     Gtk.TextDirection.NONE,
-    null
+    null,
   );
 };
 
@@ -47,7 +46,7 @@ export const getIconFromNameOrPath = (
   nameOrPath: string,
   window: Gtk.Window,
   size: number,
-  fallbackIconName: string = "image-missing-symbolic"
+  fallbackIconName: string = "image-missing-symbolic",
 ):
   | {
       readonly type: "none";
@@ -80,7 +79,7 @@ export const getIconFromNameOrPath = (
     icon,
     window.get_scale_factor(),
     size,
-    fallbackIconName
+    fallbackIconName,
   );
   if (paintable) {
     return {

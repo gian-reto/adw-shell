@@ -1,12 +1,12 @@
 import Cairo from "gi://cairo";
-import { Gtk } from "ags/gtk4";
+import type { Gtk } from "ags/gtk4";
 
 /**
  * Returns the {@link Cairo.Region} of the given widget within the given window.
  */
 export const calculateRegion = (
   window: Gtk.Window,
-  widget: Gtk.Widget
+  widget: Gtk.Widget,
 ): Cairo.Region => {
   const [, rect] = widget.compute_bounds(window);
 
@@ -18,7 +18,7 @@ export const calculateRegion = (
       y: rect.get_y(),
       width: rect.get_width(),
       height: rect.get_height(),
-    })
+    }),
   );
 
   return region;

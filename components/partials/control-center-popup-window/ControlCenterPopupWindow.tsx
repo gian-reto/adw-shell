@@ -1,27 +1,26 @@
+import Battery from "gi://AstalBattery";
+import Bluetooth from "gi://AstalBluetooth?version=0.1";
+import Network from "gi://AstalNetwork";
 import {
   Accessor,
-  With,
   createBinding,
   createComputed,
   createState,
+  With,
 } from "ags";
 import { Astal, Gdk, Gtk } from "ags/gtk4";
-import { BluetoothMenu, BluetoothToggle } from "./controls/Bluetooth";
-import { NetworkMenu, NetworkToggle } from "./controls/Network";
+import { execAsync } from "ags/process";
+import { cx } from "../../../util/cx";
+import type { GtkButtonProps } from "../../../widgets/GtkButton";
 import {
   PopupWindow,
-  PopupWindowProps,
+  type PopupWindowProps,
 } from "../../hocs/popup-window/PopupWindow";
-
-import Battery from "gi://AstalBattery";
-import Bluetooth from "gi://AstalBluetooth?version=0.1";
-import { GtkButtonProps } from "../../../widgets/GtkButton";
+import { BluetoothMenu, BluetoothToggle } from "./controls/Bluetooth";
 import { MicrophoneToggle } from "./controls/Microphone";
-import Network from "gi://AstalNetwork";
+import { NetworkMenu, NetworkToggle } from "./controls/Network";
 import { PowerMenu } from "./controls/Power";
 import { VolumeSlider } from "./controls/Volume";
-import { cx } from "../../../util/cx";
-import { execAsync } from "ags/process";
 
 export type ControlCenterPopupWindowProps = Omit<
   PopupWindowProps,
@@ -29,7 +28,7 @@ export type ControlCenterPopupWindowProps = Omit<
 >;
 
 export const ControlCenterPopupWindow = (
-  props: ControlCenterPopupWindowProps
+  props: ControlCenterPopupWindowProps,
 ) => {
   // Props
   const { $, ...restProps } = props;
@@ -48,16 +47,16 @@ export const ControlCenterPopupWindow = (
   const batteryIconName = createBinding(battery, "iconName");
   const batteryPercentage = createBinding(battery, "percentage");
   const powerIconName = createComputed([isBattery, batteryIconName]).as(
-    ([isBattery, iconName]) => (isBattery ? iconName : "ac-adapter-symbolic")
+    ([isBattery, iconName]) => (isBattery ? iconName : "ac-adapter-symbolic"),
   );
   const powerPercentage = createComputed([isBattery, batteryPercentage]).as(
-    ([isBattery, percentage]) => (isBattery ? `${percentage * 100}%` : "100%")
+    ([isBattery, percentage]) => (isBattery ? `${percentage * 100}%` : "100%"),
   );
   const isBluetoothPowered = createBinding(bluetooth, "isPowered");
   const isBluetoothConnected = createBinding(bluetooth, "isConnected");
   const isBluetoothPoweredOrConnected = createComputed(
     [isBluetoothPowered, isBluetoothConnected],
-    (isPowered, isConnected) => isPowered || isConnected
+    (isPowered, isConnected) => isPowered || isConnected,
   );
   const isWifiEnabled = createBinding(network.wifi, "enabled");
 
@@ -81,7 +80,7 @@ export const ControlCenterPopupWindow = (
                 "bg-gray-600 border border-gray-500 mt-1.5 mr-1.5",
                 // Margins to prevent shadow clipping.
                 "ml-6 mb-6",
-                "p-4 rounded-4xl shadow-xl shadow-black"
+                "p-4 rounded-4xl shadow-xl shadow-black",
               )}
               orientation={Gtk.Orientation.VERTICAL}
               overflow={Gtk.Overflow.HIDDEN}
@@ -133,7 +132,7 @@ export const ControlCenterPopupWindow = (
                       execAsync(["systemctl", "suspend"]).catch(
                         (error: unknown) => {
                           console.error("Failed to suspend: ", error);
-                        }
+                        },
                       );
                     }}
                   />
@@ -210,7 +209,7 @@ const IconButton = (props: IconButtonProps) => {
         "bg-gray-400 min-w-10 min-h-10 p-px rounded-full text-white",
         label && "px-4",
         onClicked && "hover:bg-gray-300",
-        classOverride
+        classOverride,
       )}
       hexpand={false}
       vexpand={false}

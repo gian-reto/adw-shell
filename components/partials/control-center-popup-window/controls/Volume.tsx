@@ -1,9 +1,8 @@
-import { createBinding, onCleanup, onMount } from "ags";
-
-import { Gtk } from "ags/gtk4";
-import { GtkBoxProps } from "../../../../widgets/GtkBox";
 import Wireplumber from "gi://AstalWp";
+import { createBinding, onCleanup, onMount } from "ags";
+import { Gtk } from "ags/gtk4";
 import { cx } from "../../../../util/cx";
+import type { GtkBoxProps } from "../../../../widgets/GtkBox";
 
 export type VolumeSliderProps = GtkBoxProps;
 

@@ -1,9 +1,8 @@
-import { For, createBinding } from "ags";
-
-import { Gtk } from "ags/gtk4";
-import { GtkBoxProps } from "../../../widgets/GtkBox";
 import Hyprland from "gi://AstalHyprland";
+import { createBinding, For } from "ags";
+import { Gtk } from "ags/gtk4";
 import { cx } from "../../../util/cx";
+import type { GtkBoxProps } from "../../../widgets/GtkBox";
 
 const hyprland = Hyprland.get_default();
 
@@ -18,7 +17,7 @@ export const WorkspaceIndicator = (props: WorkspaceIndicatorProps) => {
 
   // State
   const currentWorkspaces = createBinding(hyprland, "workspaces").as(
-    (workspaces) => workspaces.sort((a, b) => a.id - b.id)
+    (workspaces) => workspaces.sort((a, b) => a.id - b.id),
   );
 
   return (
@@ -45,7 +44,7 @@ type WorkspaceIndicatorItemProps = {
 const Item = ({ workspaceId }: WorkspaceIndicatorItemProps) => {
   // State
   const isFocused = createBinding(hyprland, "focusedWorkspace").as(
-    (workspace) => workspace.id === workspaceId
+    (workspace) => workspace.id === workspaceId,
   );
 
   return (
@@ -53,8 +52,8 @@ const Item = ({ workspaceId }: WorkspaceIndicatorItemProps) => {
       class={cx(
         "min-h-2 p-0 rounded-full transition-sizes hover:bg-white",
         isFocused.as((value) =>
-          value ? "bg-white min-w-9" : "bg-gray-200 min-w-2"
-        )
+          value ? "bg-white min-w-9" : "bg-gray-200 min-w-2",
+        ),
       )}
       halign={Gtk.Align.START}
       hexpand={false}

@@ -1,16 +1,18 @@
-import { ClickableBox, ClickableBoxProps } from "../clickable-box/ClickableBox";
-import { With, createState, onCleanup } from "ags";
-
 import Apps from "gi://AstalApps";
-import GLib from "gi://GLib";
+import type Notifd from "gi://AstalNotifd";
 import Gio from "gi://Gio";
-import { Gtk } from "ags/gtk4";
-import Notifd from "gi://AstalNotifd";
+import GLib from "gi://GLib";
 import Pango from "gi://Pango";
+import { createState, onCleanup, With } from "ags";
+import { Gtk } from "ags/gtk4";
 import { createPoll } from "ags/time";
 import { cx } from "../../../util/cx";
-import { isPathOfValidImage } from "../../../util/path";
 import { lookUpIcon } from "../../../util/icon";
+import { isPathOfValidImage } from "../../../util/path";
+import {
+  ClickableBox,
+  type ClickableBoxProps,
+} from "../clickable-box/ClickableBox";
 
 const apps = new Apps.Apps({
   minScore: 1,
@@ -57,7 +59,7 @@ export const Notification = (props: NotificationProps) => {
   const notificationIconPaintable = getNotificationIcon(
     notification,
     window,
-    32
+    32,
   );
   const text = body.trim() === "" ? undefined : body.trim();
   const title = summary.trim() === "" ? appName.trim() : summary.trim();
@@ -67,7 +69,7 @@ export const Notification = (props: NotificationProps) => {
   const dateTime = createPoll("", 1000 * 60, 'date --iso-8601="minutes"');
   const [isHovering, setIsHovering] = createState(false);
   const [hasInvokableActions, setHasInvokableActions] = createState(
-    actions.length > 0 && notificationIsRecent(notification)
+    actions.length > 0 && notificationIsRecent(notification),
   );
   const dateTimeUnsubscriber = dateTime.subscribe(() => {
     if (!hasInvokableActions) {
@@ -105,7 +107,7 @@ export const Notification = (props: NotificationProps) => {
       }}
       class={cx(
         "bg-gray-400 duration-100 pt-2.5 rounded-xl shadow-sm",
-        classOverride
+        classOverride,
       )}
       hexpand
       orientation={Gtk.Orientation.VERTICAL}
@@ -183,7 +185,7 @@ export const Notification = (props: NotificationProps) => {
               label={dateTime.as((_value) =>
                 showRelativeTime
                   ? `${formatTime(time)} (${formatTimeRelative(time)})`
-                  : formatTime(time) ?? ""
+                  : (formatTime(time) ?? ""),
               )}
               valign={Gtk.Align.CENTER}
               vexpand={false}
@@ -191,7 +193,7 @@ export const Notification = (props: NotificationProps) => {
             <button
               class={cx(
                 "min-h-5 min-w-5 p-px rounded-full transition-opacity",
-                isHovering.as((value) => (value ? "opacity-100" : "opacity-0"))
+                isHovering.as((value) => (value ? "opacity-100" : "opacity-0")),
               )}
               halign={Gtk.Align.END}
               hexpand={false}
@@ -312,7 +314,7 @@ const formatTimeRelative = (time: number): string => {
  * `undefined` as well, as it only looks for valid image paths.
  */
 const getNotificationImage = (
-  notification: Notifd.Notification
+  notification: Notifd.Notification,
 ): Gio.File | undefined => {
   const { appIcon, image } = notification;
 
@@ -342,7 +344,7 @@ const getNotificationImage = (
 const getNotificationIcon = (
   notification: Notifd.Notification,
   window: Gtk.Window,
-  size: number
+  size: number,
 ): Gtk.IconPaintable | undefined => {
   const { appIcon, appName } = notification;
 
@@ -376,7 +378,7 @@ const notificationHasImage = (notification: Notifd.Notification) =>
 const notificationIsRecent = (notification: Notifd.Notification): boolean => {
   if (
     GLib.DateTime.new_now_local().difference(
-      GLib.DateTime.new_from_unix_local(notification.time)
+      GLib.DateTime.new_from_unix_local(notification.time),
     ) <
     60 * 1_000_000
   ) {

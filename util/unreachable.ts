@@ -5,7 +5,7 @@
  */
 export const unreachable = (
   value: never,
-  messageOrError?: string | Error
+  messageOrError?: string | Error,
 ): never => {
   const error =
     messageOrError instanceof Error

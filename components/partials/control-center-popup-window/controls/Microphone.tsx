@@ -1,10 +1,9 @@
+import Wireplumber from "gi://AstalWp";
+import { createBinding, createComputed } from "ags";
 import {
   ToggleButton,
-  ToggleButtonProps,
+  type ToggleButtonProps,
 } from "../../../atoms/toggle-button/ToggleButton";
-import { createBinding, createComputed } from "ags";
-
-import Wireplumber from "gi://AstalWp";
 
 export type MicrophoneToggleProps = Omit<
   ToggleButtonProps,
@@ -20,10 +19,10 @@ export const MicrophoneToggle = (props: MicrophoneToggleProps) => {
   const iconName = createComputed([isMuted], (value) =>
     value
       ? "microphone-disabled-symbolic"
-      : "microphone-sensitivity-high-symbolic"
+      : "microphone-sensitivity-high-symbolic",
   );
   const label = createComputed([isMuted], (value) =>
-    value ? "Muted" : "Unmuted"
+    value ? "Muted" : "Unmuted",
   );
 
   return (
@@ -35,7 +34,7 @@ export const MicrophoneToggle = (props: MicrophoneToggleProps) => {
       onClicked={() => {
         if (wireplumber) {
           wireplumber.defaultMicrophone.set_mute(
-            !wireplumber.defaultMicrophone.mute
+            !wireplumber.defaultMicrophone.mute,
           );
         }
       }}

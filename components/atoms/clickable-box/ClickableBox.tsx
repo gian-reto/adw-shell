@@ -1,6 +1,6 @@
-import { Gtk } from "ags/gtk4";
-import { GtkBoxProps } from "../../../widgets/GtkBox";
 import { onCleanup } from "ags";
+import { Gtk } from "ags/gtk4";
+import type { GtkBoxProps } from "../../../widgets/GtkBox";
 
 export type ClickableBoxProps = GtkBoxProps & {
   /**

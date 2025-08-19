@@ -20,14 +20,14 @@ export type AppSearchProps = GtkListBoxProps &
     readonly searchTerm: Accessor<string>;
     readonly onResultClicked?: (
       source: Gtk.Button,
-      app: Apps.Application
+      app: Apps.Application,
     ) => void;
     readonly onResultsChanged?: (
       self: Gtk.ListBox,
       results: ReadonlyArray<{
         readonly data: Apps.Application;
         readonly score: number;
-      }>
+      }>,
     ) => void;
   };
 
@@ -65,7 +65,7 @@ export const AppSearch = (props: AppSearchProps) => {
   // Debounced search term update.
   const updateDebouncedSearchTerm = debounce(
     (term: string) => setDebouncedSearchTerm(term),
-    { waitForMs: 300, immediate: true, resetCooldown: false }
+    { waitForMs: 300, immediate: true, resetCooldown: false },
   );
 
   // Subscribe to search term changes and debounce them
@@ -83,8 +83,8 @@ export const AppSearch = (props: AppSearchProps) => {
             data: app,
             score: apps.fuzzy_score(term, app),
           },
-        ])
-      )
+        ]),
+      ),
   );
   const searchResults = createComputed(
     [scoredApps],
@@ -95,8 +95,8 @@ export const AppSearch = (props: AppSearchProps) => {
           .filter((app) => app.score > 0)
           .slice(0, MAX_RESULTS)
           .sort((a, b) => b.data.frequency - a.data.frequency)
-          .map((app) => app.data.name)
-      )
+          .map((app) => app.data.name),
+      ),
   );
 
   // Handlers
@@ -115,12 +115,12 @@ export const AppSearch = (props: AppSearchProps) => {
             score: app.score,
           },
         ];
-      })
+      }),
     );
   };
 
   const searchResultsUnsubscriber = searchResults.subscribe(
-    onSearchResultsChanged
+    onSearchResultsChanged,
   );
 
   // Lifecycle
@@ -139,7 +139,7 @@ export const AppSearch = (props: AppSearchProps) => {
         self.set_sort_func(
           (a, b) =>
             (scoredApps.get().get(b.get_name())?.score ?? 0) -
-            (scoredApps.get().get(a.get_name())?.score ?? 0)
+            (scoredApps.get().get(a.get_name())?.score ?? 0),
         );
       }}
       class={cx("bg-transparent", classOverride)}
@@ -193,7 +193,7 @@ export const SearchResult = (props: SearchResultProps) => {
     <button
       class={cx(
         "bg-transparent px-0 py-0 rounded-2xl hover:bg-gray-950",
-        classOverride
+        classOverride,
       )}
       {...restProps}
     >

@@ -1,21 +1,23 @@
+import Pango from "gi://Pango";
 import {
   Accessor,
-  Node,
-  State,
-  With,
   createState,
+  type Node,
   onCleanup,
   onMount,
+  State,
+  With,
 } from "ags";
 import { Astal, Gdk, Gtk } from "ags/gtk4";
-import { ClickableBox, ClickableBoxProps } from "../clickable-box/ClickableBox";
-
-import { GtkBoxProps } from "../../../widgets/GtkBox";
-import { GtkImageProps } from "../../../widgets/GtkImage";
-import { GtkLabelProps } from "../../../widgets/GtkLabel";
-import { GtkRevealerProps } from "../../../widgets/GtkRevealer";
-import Pango from "gi://Pango";
 import { cx } from "../../../util/cx";
+import type { GtkBoxProps } from "../../../widgets/GtkBox";
+import type { GtkImageProps } from "../../../widgets/GtkImage";
+import type { GtkLabelProps } from "../../../widgets/GtkLabel";
+import type { GtkRevealerProps } from "../../../widgets/GtkRevealer";
+import {
+  ClickableBox,
+  type ClickableBoxProps,
+} from "../clickable-box/ClickableBox";
 
 export type ToggleButtonProps = Omit<GtkBoxProps, "children"> & {
   readonly iconName: string | Accessor<string>;
@@ -59,7 +61,7 @@ export const ToggleButton = (props: ToggleButtonProps) => {
       ? new Accessor(() => isExpandableOverride)
       : isExpandableOverride;
   const [isExpanded, setExpanded] = createState(
-    typeof isExpandedOverride === "boolean" ? isExpandedOverride : false
+    typeof isExpandedOverride === "boolean" ? isExpandedOverride : false,
   );
 
   // Lifecycle
@@ -83,11 +85,11 @@ export const ToggleButton = (props: ToggleButtonProps) => {
           isActive.as((value) =>
             value
               ? "bg-primary-3 hover:bg-primary-2"
-              : "bg-gray-500 hover:bg-gray-400"
+              : "bg-gray-500 hover:bg-gray-400",
           ),
           isExpandable.as((value) =>
-            value ? "rounded-l-full" : "rounded-full"
-          )
+            value ? "rounded-l-full" : "rounded-full",
+          ),
         )}
         halign={Gtk.Align.FILL}
         hexpand
@@ -122,8 +124,8 @@ export const ToggleButton = (props: ToggleButtonProps) => {
                 isActive.as((active) =>
                   active
                     ? "bg-primary-2 border-primary-1 hover:bg-primary-1"
-                    : "bg-gray-400 border-gray-300 hover:bg-gray-300"
-                )
+                    : "bg-gray-400 border-gray-300 hover:bg-gray-300",
+                ),
               )}
               halign={Gtk.Align.END}
               hexpand={false}
@@ -216,7 +218,9 @@ const ToggleButtonMenu = (props: ToggleButtonMenuProps) => {
           <box
             class={cx(
               "rounded-full p-2",
-              isActive.as((active) => (active ? "bg-primary-3" : "bg-gray-300"))
+              isActive.as((active) =>
+                active ? "bg-primary-3" : "bg-gray-300",
+              ),
             )}
             halign={Gtk.Align.START}
             hexpand={false}
@@ -287,7 +291,7 @@ const ToggleButtonMenuItem = (props: ToggleButtonMenuItemProps) => {
     <ClickableBox
       class={cx(
         "bg-gray-400 px-3 py-2 rounded-xl transition-colors hover:bg-gray-300",
-        classOverride
+        classOverride,
       )}
       {...restProps}
     >

@@ -1,18 +1,17 @@
+import Mpris from "gi://AstalMpris";
+import Pango from "gi://Pango";
 import {
   Accessor,
-  With,
   createBinding,
   createComputed,
   createState,
   onCleanup,
   onMount,
+  With,
 } from "ags";
-
 import { Gtk } from "ags/gtk4";
-import { GtkBoxProps } from "../../../widgets/GtkBox";
-import Mpris from "gi://AstalMpris";
-import Pango from "gi://Pango";
 import { cx } from "../../../util/cx";
+import type { GtkBoxProps } from "../../../widgets/GtkBox";
 
 type MusicPlayerProps = Omit<GtkBoxProps, "baselinePosition" | "visible">;
 
@@ -33,10 +32,10 @@ export const MusicPlayer = (props: MusicPlayerProps) => {
 
     const player =
       availablePlayers.find(
-        (player) => player.playbackStatus === Mpris.PlaybackStatus.PLAYING
+        (player) => player.playbackStatus === Mpris.PlaybackStatus.PLAYING,
       ) ??
       availablePlayers.find(
-        (player) => player.playbackStatus === Mpris.PlaybackStatus.PAUSED
+        (player) => player.playbackStatus === Mpris.PlaybackStatus.PAUSED,
       );
 
     if (player) {
@@ -51,7 +50,7 @@ export const MusicPlayer = (props: MusicPlayerProps) => {
   // Subscribe to player changes.
   const notifyPlayersHandlerId = mpris.connect(
     "notify::players",
-    onPlayersChanged
+    onPlayersChanged,
   );
 
   // Lifecycle
@@ -94,7 +93,7 @@ const MusicPlayerBox = (props: MusicPlayerBoxProps) => {
     [canPlay, canPause],
     (canPlay, canPause) => {
       return canPlay || canPause;
-    }
+    },
   );
   const coverArt = createBinding(player, "coverArt");
   const playbackStatus = createBinding(player, "playbackStatus");
@@ -104,7 +103,7 @@ const MusicPlayerBox = (props: MusicPlayerBoxProps) => {
     <box
       class={cx(
         "bg-gray-400 duration-100 p-3 pr-5 rounded-xl shadow-sm space-x-3",
-        classOverride
+        classOverride,
       )}
       baselinePosition={Gtk.BaselinePosition.CENTER}
       hexpand
@@ -119,7 +118,7 @@ const MusicPlayerBox = (props: MusicPlayerBoxProps) => {
       >
         <With value={coverArt}>
           {(coverArt) =>
-            !!coverArt ? (
+            coverArt ? (
               <image
                 class="bg-gray-500 min-w-14 min-h-14 rounded-lg shadow-sm"
                 file={coverArt}
@@ -193,7 +192,7 @@ const MusicPlayerBox = (props: MusicPlayerBoxProps) => {
             iconName={playbackStatus.as<string>((value) =>
               value === Mpris.PlaybackStatus.PLAYING
                 ? "media-playback-pause-symbolic"
-                : "media-playback-start-symbolic"
+                : "media-playback-start-symbolic",
             )}
           />
         </button>

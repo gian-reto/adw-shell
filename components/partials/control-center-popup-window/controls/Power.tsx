@@ -1,12 +1,11 @@
+import { Gtk } from "ags/gtk4";
+import { execAsync } from "ags/process";
+import { cx } from "../../../../util/cx";
 import {
   ToggleButtonMenu,
-  ToggleButtonMenuItemProps,
-  ToggleButtonMenuProps,
+  type ToggleButtonMenuItemProps,
+  type ToggleButtonMenuProps,
 } from "../../../atoms/toggle-button/ToggleButton";
-
-import { Gtk } from "ags/gtk4";
-import { cx } from "../../../../util/cx";
-import { execAsync } from "ags/process";
 
 export type PowerMenuProps = Omit<
   ToggleButtonMenuProps,
@@ -51,7 +50,7 @@ export const PowerMenu = (props: PowerMenuProps) => {
             execAsync(["hyprctl", "dispatch", "exit"]).catch(
               (error: unknown) => {
                 console.error("Failed to log out", error);
-              }
+              },
             );
           }}
         />

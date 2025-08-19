@@ -1,10 +1,9 @@
-import { Accessor, For, createState, onCleanup } from "ags";
-import { ListBox, ListBoxProps } from "../../hocs/list-box/ListBox";
-import { MapKey, MapValue } from "../../../util/map";
-
+import { Accessor, createState, For, onCleanup } from "ags";
 import { Gtk } from "ags/gtk4";
-import { createPoll } from "ags/time";
 import { exec } from "ags/process";
+import { createPoll } from "ags/time";
+import type { MapKey, MapValue } from "../../../util/map";
+import { ListBox, type ListBoxProps } from "../../hocs/list-box/ListBox";
 
 export type WorldClocksListProps = Omit<
   ListBoxProps,
@@ -25,7 +24,7 @@ export const WorldClocksList = (props: WorldClocksListProps) => {
   const dateTime = createPoll("", 1000, 'date --iso-8601="minutes"');
   const [currentDateTime, setCurrentDateTime] = createState(dateTime.get());
   const [worldClocks, setWorldClocks] = createState<Array<WorldClock>>(
-    getWorldClocks(currentDateTime.get())
+    getWorldClocks(currentDateTime.get()),
   );
 
   // Lifecycle
@@ -62,7 +61,7 @@ export const WorldClocksList = (props: WorldClocksListProps) => {
               .split("/")
               .at(-1)
               ?.replace("_", " ") ?? "Unknown"
-          }`
+          }`,
       )}
       title="World Clocks"
       {...restProps}

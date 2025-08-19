@@ -1,15 +1,14 @@
-import { Astal, Gtk } from "ags/gtk4";
-import {
-  PopupWindow,
-  PopupWindowProps,
-} from "../../hocs/popup-window/PopupWindow";
-import { With, createComputed, createState } from "ags";
-
-import { AppGrid } from "./modes/AppGrid";
-import { AppSearch } from "./modes/AppSearch";
 import Apps from "gi://AstalApps";
+import { createComputed, createState, With } from "ags";
+import { Astal, Gtk } from "ags/gtk4";
 import { cx } from "../../../util/cx";
 import { unreachable } from "../../../util/unreachable";
+import {
+  PopupWindow,
+  type PopupWindowProps,
+} from "../../hocs/popup-window/PopupWindow";
+import { AppGrid } from "./modes/AppGrid";
+import { AppSearch } from "./modes/AppSearch";
 
 export type LauncherPopupWindowProps = Omit<
   PopupWindowProps,
@@ -89,7 +88,7 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
                 }}
                 class={cx(
                   "launcher-entry",
-                  entryDirty.as((value) => value && "dirty")
+                  entryDirty.as((value) => value && "dirty"),
                 )}
                 hasFrame={false}
                 halign={Gtk.Align.FILL}
@@ -155,8 +154,8 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
                         >(
                           (acc, curr) =>
                             (acc?.score ?? 0) > curr.score ? acc : curr,
-                          undefined
-                        )?.data
+                          undefined,
+                        )?.data,
                       )
                     }
                   />

@@ -13,7 +13,7 @@ export type Position =
   | "right-top";
 
 export const positionToAlignment = (
-  position: Position
+  position: Position,
 ): {
   readonly halign: Gtk.Align;
   readonly valign: Gtk.Align;

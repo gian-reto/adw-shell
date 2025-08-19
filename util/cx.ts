@@ -45,7 +45,6 @@ function cx(
     if (arg instanceof Accessor) {
       accessors.push(arg);
       classNames.push(ACCESSOR_PLACEHOLDER);
-      continue;
     }
   }
 

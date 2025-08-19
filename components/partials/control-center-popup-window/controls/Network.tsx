@@ -1,21 +1,20 @@
-import { Accessor, For, With, createBinding, createComputed } from "ags";
-import {
-  ToggleButton,
-  ToggleButtonMenu,
-  ToggleButtonMenuItemProps,
-  ToggleButtonMenuProps,
-  ToggleButtonProps,
-} from "../../../atoms/toggle-button/ToggleButton";
+import Network from "gi://AstalNetwork";
+import { type Accessor, createBinding, createComputed, For, With } from "ags";
+import type GObject from "ags/gobject";
+import { Gtk } from "ags/gtk4";
+import { execAsync } from "ags/process";
+import { cx } from "../../../../util/cx";
 import {
   getIconNameForClient,
   getLabelForClient,
 } from "../../../../util/network-manager";
-
-import GObject from "ags/gobject";
-import { Gtk } from "ags/gtk4";
-import Network from "gi://AstalNetwork";
-import { cx } from "../../../../util/cx";
-import { execAsync } from "ags/process";
+import {
+  ToggleButton,
+  ToggleButtonMenu,
+  type ToggleButtonMenuItemProps,
+  type ToggleButtonMenuProps,
+  type ToggleButtonProps,
+} from "../../../atoms/toggle-button/ToggleButton";
 
 const network = Network.get_default();
 
@@ -32,7 +31,7 @@ export const NetworkToggle = (props: NetworkToggleProps) => {
   const iconName = createComputed([networkClient], getIconNameForClient);
   const label = createComputed(
     [networkClient, wifiSsid],
-    (client, ssid) => ssid || getLabelForClient(client)
+    (client, ssid) => ssid || getLabelForClient(client),
   );
 
   return (
@@ -66,16 +65,16 @@ export const NetworkMenu = (props: NetworkMenuProps) => {
         .reduce<Array<Network.AccessPoint>>((acc, accessPoint) => {
           return acc.some((ap) => ap.ssid === accessPoint.ssid)
             ? acc
-            : !!accessPoint.ssid
-            ? [...acc, accessPoint]
-            : acc;
+            : accessPoint.ssid
+              ? [...acc, accessPoint]
+              : acc;
         }, [])
         .sort((a, b) => b.strength - a.strength)
-        .slice(0, 10)
+        .slice(0, 10),
   );
   const wifiActiveAccessPoint = createBinding(
     network.wifi,
-    "activeAccessPoint"
+    "activeAccessPoint",
   );
 
   return (
@@ -84,7 +83,7 @@ export const NetworkMenu = (props: NetworkMenuProps) => {
       isLoading={isScanning}
       onNotifyRevealChild={(
         source: Gtk.Revealer,
-        pspec: GObject.ParamSpec<unknown>
+        pspec: GObject.ParamSpec<unknown>,
       ) => {
         onNotifyRevealChild?.(source, pspec);
 
@@ -138,7 +137,7 @@ const NetworkMenuItem = (props: NetworkMenuItemProps) => {
   const ssid = createBinding(accessPoint, "ssid");
   const isActive = createComputed(
     [activeAccessPoint],
-    (value) => accessPoint === value
+    (value) => accessPoint === value,
   );
 
   return (
@@ -151,7 +150,7 @@ const NetworkMenuItem = (props: NetworkMenuItemProps) => {
           execAsync(["nmcli", "connection", "down", accessPoint.ssid]).catch(
             (error: unknown) => {
               console.error("Failed to disconnect from network: ", error);
-            }
+            },
           );
         } else {
           execAsync([

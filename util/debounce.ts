@@ -1,4 +1,4 @@
-import AstalIO from "gi://AstalIO";
+import type AstalIO from "gi://AstalIO";
 import { timeout } from "ags/time";
 
 /**
@@ -7,7 +7,7 @@ import { timeout } from "ags/time";
 export const debounce = <
   F extends (
     ...args: Parameters<F>
-  ) => Exclude<ReturnType<F>, PromiseLike<unknown>>
+  ) => Exclude<ReturnType<F>, PromiseLike<unknown>>,
 >(
   fn: F,
   options: {
@@ -26,12 +26,12 @@ export const debounce = <
      * Defaults to `true`.
      */
     readonly resetCooldown?: boolean;
-  }
+  },
 ): ((...args: Parameters<F>) => void) => {
   const { waitForMs, immediate = true, resetCooldown = true } = options;
 
-  let timer: AstalIO.Time | undefined = undefined;
-  let lastArgs: Parameters<F> | undefined = undefined;
+  let timer: AstalIO.Time | undefined;
+  let lastArgs: Parameters<F> | undefined;
 
   const later = () => {
     timer = undefined;

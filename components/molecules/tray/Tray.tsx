@@ -1,14 +1,13 @@
-import { Accessor, For, createBinding, onCleanup } from "ags";
-import {
-  GtkMenuButton,
-  GtkMenuButtonProps,
-} from "../../../widgets/GtkMenuButton";
-
 import AstalTray from "gi://AstalTray";
+import { type Accessor, createBinding, For, onCleanup } from "ags";
 import { Gtk } from "ags/gtk4";
-import { GtkBoxProps } from "../../../widgets/GtkBox";
 import { cx } from "../../../util/cx";
 import { unreachable } from "../../../util/unreachable";
+import type { GtkBoxProps } from "../../../widgets/GtkBox";
+import {
+  GtkMenuButton,
+  type GtkMenuButtonProps,
+} from "../../../widgets/GtkMenuButton";
 
 export type TrayProps = GtkBoxProps & {
   readonly extraItems?: Array<CustomTrayItem["data"]>;
@@ -65,7 +64,7 @@ const TrayItem = (props: TrayItemProps) => {
   // Handlers
   const handleDataChanged = (
     self: Gtk.MenuButton,
-    item: AstalTray.TrayItem
+    item: AstalTray.TrayItem,
   ) => {
     if (!item.menuModel || item.menuModel.get_n_items() < 1) {
       self.set_menu_model(null);
@@ -116,7 +115,7 @@ const TrayItem = (props: TrayItemProps) => {
       }}
       class={cx(
         "bg-transparent min-w-7 min-h-7 p-0 rounded-full transition-colors hover:bg-gray-800",
-        classOverride
+        classOverride,
       )}
       halign={Gtk.Align.CENTER}
       hexpand={false}

@@ -1,12 +1,11 @@
+import { createState, With } from "ags";
 import { Astal, Gtk } from "ags/gtk4";
+import { cx } from "../../../util/cx";
 import {
   PopupWindow,
-  PopupWindowProps,
+  type PopupWindowProps,
 } from "../../hocs/popup-window/PopupWindow";
-import { With, createState } from "ags";
-
 import { NotificationCenter } from "../../organisms/notification-center/NotificationCenter";
-import { cx } from "../../../util/cx";
 
 export type NotificationCenterPopupWindowProps = Omit<
   PopupWindowProps,
@@ -14,7 +13,7 @@ export type NotificationCenterPopupWindowProps = Omit<
 >;
 
 export const NotificationCenterPopupWindow = (
-  props: NotificationCenterPopupWindowProps
+  props: NotificationCenterPopupWindowProps,
 ) => {
   // Props
   const { $, ...restProps } = props;
@@ -39,7 +38,7 @@ export const NotificationCenterPopupWindow = (
           "bg-gray-600 border border-gray-500 mt-1.5",
           // Margins to prevent shadow clipping.
           "ml-6 mr-6 mb-6",
-          "rounded-3xl shadow-xl shadow-black"
+          "rounded-3xl shadow-xl shadow-black",
         )}
         overflow={Gtk.Overflow.HIDDEN}
       >

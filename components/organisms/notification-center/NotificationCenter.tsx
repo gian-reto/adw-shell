@@ -1,17 +1,17 @@
-import {
-  NotificationList,
-  NotificationListProps,
-} from "../../molecules/notification-list/NotificationList";
+import Notifd from "gi://AstalNotifd";
 import { createBinding, onCleanup, onMount } from "ags";
 
 import { Gtk } from "ags/gtk4";
-import { GtkBoxProps } from "../../../widgets/GtkBox";
-import { GtkCalendar } from "../../../widgets/GtkCalendar";
-import { MusicPlayer } from "../../molecules/music-player/MusicPlayer";
-import Notifd from "gi://AstalNotifd";
-import { WorldClocksList } from "../../molecules/world-clocks-list/WorldClocksList";
 import { createPoll } from "ags/time";
 import { cx } from "../../../util/cx";
+import type { GtkBoxProps } from "../../../widgets/GtkBox";
+import { GtkCalendar } from "../../../widgets/GtkCalendar";
+import { MusicPlayer } from "../../molecules/music-player/MusicPlayer";
+import {
+  NotificationList,
+  type NotificationListProps,
+} from "../../molecules/notification-list/NotificationList";
+import { WorldClocksList } from "../../molecules/world-clocks-list/WorldClocksList";
 
 export type NotificationCenterProps = GtkBoxProps &
   Pick<NotificationListProps, "window">;
@@ -31,7 +31,7 @@ export const NotificationCenter = (props: NotificationCenterProps) => {
     "",
     // Poll every minute.
     1000 * 60,
-    'date +"%A %d %B %Y"'
+    'date +"%A %d %B %Y"',
   );
   const doNotDisturb = createBinding(notifd, "dontDisturb");
   const isWindowVisible = createBinding(window, "visible");
@@ -47,7 +47,7 @@ export const NotificationCenter = (props: NotificationCenterProps) => {
   onMount(() => {
     doNotDisturbSwitchStateSetHandlerId = doNotDisturbSwitch.connect(
       "state-set",
-      onDoNotDisturbChanged
+      onDoNotDisturbChanged,
     );
   });
 
@@ -114,7 +114,7 @@ export const NotificationCenter = (props: NotificationCenterProps) => {
               vexpand={false}
               onClicked={() => {
                 notifd.notifications.forEach((notification) =>
-                  notification.dismiss()
+                  notification.dismiss(),
                 );
               }}
             >

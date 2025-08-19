@@ -1,27 +1,26 @@
+import Bluetooth from "gi://AstalBluetooth";
 import {
   Accessor,
-  For,
-  With,
   createBinding,
   createComputed,
+  For,
   onCleanup,
   onMount,
+  With,
 } from "ags";
+import type GObject from "ags/gobject";
+import { Gtk } from "ags/gtk4";
+import { execAsync } from "ags/process";
+import { cx } from "../../../../util/cx";
+import { debounce } from "../../../../util/debounce";
+import { unreachable } from "../../../../util/unreachable";
 import {
   ToggleButton,
   ToggleButtonMenu,
-  ToggleButtonMenuItemProps,
-  ToggleButtonMenuProps,
-  ToggleButtonProps,
+  type ToggleButtonMenuItemProps,
+  type ToggleButtonMenuProps,
+  type ToggleButtonProps,
 } from "../../../atoms/toggle-button/ToggleButton";
-
-import Bluetooth from "gi://AstalBluetooth";
-import GObject from "ags/gobject";
-import { Gtk } from "ags/gtk4";
-import { cx } from "../../../../util/cx";
-import { debounce } from "../../../../util/debounce";
-import { execAsync } from "ags/process";
-import { unreachable } from "../../../../util/unreachable";
 
 const bluetooth = Bluetooth.get_default();
 
@@ -36,22 +35,22 @@ export const BluetoothToggle = (props: BluetoothToggleProps) => {
   const isConnected = createBinding(bluetooth, "isConnected");
   const isActive = createComputed(
     [isPowered, isConnected],
-    (isPowered, isConnected) => isPowered || isConnected
+    (isPowered, isConnected) => isPowered || isConnected,
   );
   const connectedDevice = createBinding(bluetooth, "devices").as((devices) =>
-    devices.length > 0 ? devices.find((device) => device.connected) : undefined
+    devices.length > 0 ? devices.find((device) => device.connected) : undefined,
   );
   const iconName = createComputed(
     [isPowered, isConnected],
     (isPowered, isConnected) =>
       isPowered || isConnected
         ? "bluetooth-active-symbolic"
-        : "bluetooth-disabled-symbolic"
+        : "bluetooth-disabled-symbolic",
   );
   const label = createComputed(
     [connectedDevice, isPowered],
     (connectedDevice, isPowered) =>
-      connectedDevice?.alias || (isPowered ? "Bluetooth" : "Disabled")
+      connectedDevice?.alias || (isPowered ? "Bluetooth" : "Disabled"),
   );
 
   return (
@@ -87,7 +86,7 @@ export const BluetoothMenu = (props: BluetoothMenuProps) => {
         return b.rssi - a.rssi;
       })
       .sort((a, b) => b.rssi - a.rssi)
-      .slice(0, 10)
+      .slice(0, 10),
   );
 
   return (
@@ -96,7 +95,7 @@ export const BluetoothMenu = (props: BluetoothMenuProps) => {
       isLoading={isDiscovering}
       onNotifyRevealChild={(
         source: Gtk.Revealer,
-        pspec: GObject.ParamSpec<unknown>
+        pspec: GObject.ParamSpec<unknown>,
       ) => {
         onNotifyRevealChild?.(source, pspec);
 
@@ -108,7 +107,7 @@ export const BluetoothMenu = (props: BluetoothMenuProps) => {
           } catch (error: unknown) {
             console.error(
               "Failed to start bluetooth discovery. Trigger: revealer expanded. Error: ",
-              error
+              error,
             );
           }
           return;
@@ -204,7 +203,7 @@ const BluetoothMenuItem = (props: BluetoothMenuItemProps) => {
   onMount(() => {
     connectSwitchStateSetHandlerId = connectSwitch.connect(
       "state-set",
-      onConnectChanged
+      onConnectChanged,
     );
   });
 
@@ -266,7 +265,7 @@ const connectDevice = (device: Bluetooth.Device): void => {
   execAsync(["bluetoothctl", "connect", device.get_address()]).catch(
     (error: unknown) => {
       console.error("Failed to connect device: ", error);
-    }
+    },
   );
   return;
 };
@@ -280,6 +279,6 @@ const disconnectDevice = (device: Bluetooth.Device): void => {
   execAsync(["bluetoothctl", "disconnect", device.get_address()]).catch(
     (error: unknown) => {
       console.error("Failed to disconnect device: ", error);
-    }
+    },
   );
 };

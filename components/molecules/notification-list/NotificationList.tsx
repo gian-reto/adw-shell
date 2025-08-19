@@ -1,16 +1,15 @@
-import { For, With, createBinding } from "ags";
+import Notifd from "gi://AstalNotifd";
+import { createBinding, For, With } from "ags";
+import { Gtk } from "ags/gtk4";
+import { cx } from "../../../util/cx";
 import {
   GtkScrolledWindow,
-  GtkScrolledWindowProps,
+  type GtkScrolledWindowProps,
 } from "../../../widgets/GtkScrolledWindow";
 import {
   Notification,
-  NotificationProps,
+  type NotificationProps,
 } from "../../atoms/notification/Notification";
-
-import { Gtk } from "ags/gtk4";
-import Notifd from "gi://AstalNotifd";
-import { cx } from "../../../util/cx";
 
 export type NotificationListProps = Omit<
   GtkScrolledWindowProps,
@@ -27,7 +26,7 @@ export const NotificationList = (props: NotificationListProps) => {
 
   // State
   const currentNotifications = createBinding(notifd, "notifications").as(
-    (notifications) => notifications.sort((a, b) => a.time - b.time)
+    (notifications) => notifications.sort((a, b) => a.time - b.time),
   );
 
   return (
