@@ -25,8 +25,14 @@ const getIconNameForDeviceType = (deviceType: NM.DeviceType): string => {
   }
 };
 
-export const getIconNameForClient = (client: NM.Client): string => {
-  switch (client.connectivity) {
+export const getIconNameForNetworkClient = ({
+  connectivity,
+  primaryConnection,
+}: {
+  readonly connectivity: NM.ConnectivityState;
+  readonly primaryConnection?: NM.ActiveConnection | null;
+}): string => {
+  switch (connectivity) {
     case NM.ConnectivityState.NONE:
     case NM.ConnectivityState.PORTAL:
     case NM.ConnectivityState.UNKNOWN:
@@ -40,10 +46,10 @@ export const getIconNameForClient = (client: NM.Client): string => {
       break;
 
     default:
-      return unreachable(client.connectivity);
+      return unreachable(connectivity);
   }
 
-  const device = client.primaryConnection?.get_devices()[0];
+  const device = primaryConnection?.get_devices()[0];
   // `device` should be defined at this point, but still fall back to the
   // offline icon if there's no `primaryConnection` or no devices.
   if (!device) {
@@ -73,8 +79,12 @@ const getLabelForDeviceType = (deviceType: NM.DeviceType): string => {
   }
 };
 
-export const getLabelForClient = (client: NM.Client): string => {
-  const device = client.primaryConnection?.get_devices()[0];
+export const getLabelForNetworkClient = ({
+  primaryConnection,
+}: {
+  readonly primaryConnection?: NM.ActiveConnection | null;
+}): string => {
+  const device = primaryConnection?.get_devices()[0];
   if (!device) {
     return "No Network";
   }

@@ -5,8 +5,8 @@ import { Gtk } from "ags/gtk4";
 import { execAsync } from "ags/process";
 import { cx } from "../../../../util/cx";
 import {
-  getIconNameForClient,
-  getLabelForClient,
+  getIconNameForNetworkClient,
+  getLabelForNetworkClient,
 } from "../../../../util/network-manager";
 import {
   ToggleButton,
@@ -15,6 +15,8 @@ import {
   type ToggleButtonMenuProps,
   type ToggleButtonProps,
 } from "../../../atoms/toggle-button/ToggleButton";
+import { createBindingDeep } from "../../../../util/binding";
+import AstalNetwork from "gi://AstalNetwork?version=0.1";
 
 const network = Network.get_default();
 
@@ -25,21 +27,45 @@ export type NetworkToggleProps = Omit<
 
 export const NetworkToggle = (props: NetworkToggleProps) => {
   // State
-  const networkClient = createBinding(network, "client");
-  const isWifiActive = createBinding(network.wifi, "enabled");
-  const wifiSsid = createBinding(network.wifi, "ssid");
-  const iconName = createComputed([networkClient], getIconNameForClient);
+  const networkClientConnectivity = createBindingDeep(
+    network,
+    "client.connectivity",
+  );
+  const networkClientPrimaryConnection = createBindingDeep(
+    network,
+    "client.primaryConnection",
+  );
+  const networkIsWifi = createBinding(network, "primary").as(
+    (primary) => primary === AstalNetwork.Primary.WIFI,
+  );
+  const networkWifiEnabled = createBindingDeep(network, "wifi.enabled");
+  const networkWifiSsid = createBindingDeep(network, "wifi.ssid");
+  const iconName = createComputed(
+    [networkClientConnectivity, networkClientPrimaryConnection],
+    (connectivity, primaryConnection) =>
+      getIconNameForNetworkClient({ connectivity, primaryConnection }),
+  );
   const label = createComputed(
-    [networkClient, wifiSsid],
-    (client, ssid) => ssid || getLabelForClient(client),
+    [networkClientPrimaryConnection, networkIsWifi, networkWifiSsid],
+    (primaryConnection, isWifi, wifiSsid) => {
+      // Show the Wi-Fi SSID if the primary connection is Wi-Fi.
+      if (isWifi) {
+        return wifiSsid;
+      }
+
+      return getLabelForNetworkClient({
+        primaryConnection,
+      });
+    },
   );
 
   return (
     <ToggleButton
-      isActive={isWifiActive}
+      isActive={networkWifiEnabled}
       isExpandable
       iconName={iconName}
       label={label}
+      sensitive={networkWifiEnabled}
       onClicked={(_self) => {
         network.wifi.enabled = !network.wifi.enabled;
       }}
@@ -58,29 +84,31 @@ export const NetworkMenu = (props: NetworkMenuProps) => {
   const { onNotifyRevealChild, ...restProps } = props;
 
   // State
-  const isScanning = createBinding(network.wifi, "scanning");
-  const wifiAccessPoints = createBinding(network.wifi, "accessPoints").as(
-    (accessPoints) =>
-      accessPoints
-        .reduce<Array<Network.AccessPoint>>((acc, accessPoint) => {
-          return acc.some((ap) => ap.ssid === accessPoint.ssid)
-            ? acc
-            : accessPoint.ssid
-              ? [...acc, accessPoint]
-              : acc;
-        }, [])
-        .sort((a, b) => b.strength - a.strength)
-        .slice(0, 10),
+  const networkWifiScanning = createBindingDeep(network, "wifi.scanning");
+  const networkWifiAccessPoints = createBindingDeep(
+    network,
+    "wifi.accessPoints",
+  ).as((accessPoints) =>
+    accessPoints
+      .reduce<Array<Network.AccessPoint>>((acc, accessPoint) => {
+        return acc.some((ap) => ap.ssid === accessPoint.ssid)
+          ? acc
+          : accessPoint.ssid
+            ? [...acc, accessPoint]
+            : acc;
+      }, [])
+      .sort((a, b) => b.strength - a.strength)
+      .slice(0, 10),
   );
-  const wifiActiveAccessPoint = createBinding(
-    network.wifi,
-    "activeAccessPoint",
+  const networkWifiActiveAccessPoint = createBindingDeep(
+    network,
+    "wifi.activeAccessPoint",
   );
 
   return (
     <ToggleButtonMenu
       iconName="network-wireless-symbolic"
-      isLoading={isScanning}
+      isLoading={networkWifiScanning}
       onNotifyRevealChild={(
         source: Gtk.Revealer,
         pspec: GObject.ParamSpec<unknown>,
@@ -97,15 +125,15 @@ export const NetworkMenu = (props: NetworkMenuProps) => {
       {...restProps}
     >
       <box hexpand orientation={Gtk.Orientation.VERTICAL}>
-        <For each={wifiAccessPoints}>
+        <For each={networkWifiAccessPoints}>
           {(accessPoint) => (
             <NetworkMenuItem
               accessPoint={accessPoint}
-              activeAccessPoint={wifiActiveAccessPoint}
+              activeAccessPoint={networkWifiActiveAccessPoint}
             />
           )}
         </For>
-        <With value={wifiAccessPoints}>
+        <With value={networkWifiAccessPoints}>
           {(accessPoints) =>
             accessPoints.length === 0 && (
               <label class="pt-1 pb-3" label="No networks found" />

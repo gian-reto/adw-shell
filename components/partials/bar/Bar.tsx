@@ -1,16 +1,18 @@
-import Network from "gi://AstalNetwork";
-import Wireplumber from "gi://AstalWp";
 import { Accessor, createBinding, createComputed } from "ags";
-import type GObject from "ags/gobject";
 import { Astal, Gtk } from "ags/gtk4";
+
+import { ClickableBox } from "../../atoms/clickable-box/ClickableBox";
+import type GObject from "ags/gobject";
+import type { GtkWindowProps } from "../../../widgets/GtkWindow";
+import Network from "gi://AstalNetwork";
+import { Tray } from "../../molecules/tray/Tray";
+import Wireplumber from "gi://AstalWp";
+import { WorkspaceIndicator } from "../../atoms/workspace-indicator/WorkspaceIndicator";
 import app from "ags/gtk4/app";
+import { createBindingDeep } from "../../../util/binding";
 import { createPoll } from "ags/time";
 import { cx } from "../../../util/cx";
-import { getIconNameForClient } from "../../../util/network-manager";
-import type { GtkWindowProps } from "../../../widgets/GtkWindow";
-import { ClickableBox } from "../../atoms/clickable-box/ClickableBox";
-import { WorkspaceIndicator } from "../../atoms/workspace-indicator/WorkspaceIndicator";
-import { Tray } from "../../molecules/tray/Tray";
+import { getIconNameForNetworkClient } from "../../../util/network-manager";
 
 export type BarProps = Omit<
   GtkWindowProps,
@@ -33,8 +35,19 @@ export default function Bar(props: BarProps): GObject.Object {
 
   // State
   const dateTime = createPoll("", 1000, 'date --iso-8601="minutes"');
-  const networkClient = createBinding(network, "client");
-  const networkIcon = createComputed([networkClient], getIconNameForClient);
+  const networkClientConnectivity = createBindingDeep(
+    network,
+    "client.connectivity",
+  );
+  const networkClientPrimaryConnection = createBindingDeep(
+    network,
+    "client.primaryConnection",
+  );
+  const networkIcon = createComputed(
+    [networkClientConnectivity, networkClientPrimaryConnection],
+    (connectivity, primaryConnection) =>
+      getIconNameForNetworkClient({ connectivity, primaryConnection }),
+  );
   const speakerIcon = createComputed(
     [
       createBinding(wireplumber.defaultSpeaker, "mute"),
