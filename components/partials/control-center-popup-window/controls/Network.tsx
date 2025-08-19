@@ -7,8 +7,8 @@ import {
   ToggleButtonProps,
 } from "../../../atoms/toggle-button/ToggleButton";
 import {
-  getIconNameForDeviceType,
-  getLabelForDeviceType,
+  getIconNameForClient,
+  getLabelForClient,
 } from "../../../../util/network-manager";
 
 import GObject from "ags/gobject";
@@ -26,17 +26,13 @@ export type NetworkToggleProps = Omit<
 
 export const NetworkToggle = (props: NetworkToggleProps) => {
   // State
-  const primaryConnectionDevice = createBinding(network, "client").as(
-    (value) => value.primaryConnection.get_devices()[0]
-  );
+  const networkClient = createBinding(network, "client");
   const isWifiActive = createBinding(network.wifi, "enabled");
   const wifiSsid = createBinding(network.wifi, "ssid");
-  const iconName = createComputed([primaryConnectionDevice], (device) =>
-    getIconNameForDeviceType(device.deviceType)
-  );
+  const iconName = createComputed([networkClient], getIconNameForClient);
   const label = createComputed(
-    [primaryConnectionDevice, wifiSsid],
-    (device, ssid) => ssid || getLabelForDeviceType(device.deviceType)
+    [networkClient, wifiSsid],
+    (client, ssid) => ssid || getLabelForClient(client)
   );
 
   return (

@@ -4,7 +4,6 @@ import { Astal, Gtk } from "ags/gtk4";
 import { ClickableBox } from "../../atoms/clickable-box/ClickableBox";
 import GObject from "ags/gobject";
 import { GtkWindowProps } from "../../../widgets/GtkWindow";
-import NM from "gi://NM";
 import Network from "gi://AstalNetwork";
 import { Tray } from "../../molecules/tray/Tray";
 import Wireplumber from "gi://AstalWp";
@@ -12,8 +11,7 @@ import { WorkspaceIndicator } from "../../atoms/workspace-indicator/WorkspaceInd
 import app from "ags/gtk4/app";
 import { createPoll } from "ags/time";
 import { cx } from "../../../util/cx";
-import { getIconNameForDeviceType } from "../../../util/network-manager";
-import { unreachable } from "../../../util/unreachable";
+import { getIconNameForClient } from "../../../util/network-manager";
 
 export type BarProps = Omit<
   GtkWindowProps,
@@ -37,27 +35,7 @@ export default function Bar(props: BarProps): GObject.Object {
   // State
   const dateTime = createPoll("", 1000, 'date --iso-8601="minutes"');
   const networkClient = createBinding(network, "client");
-  const networkIcon = createComputed([networkClient], (client) => {
-    switch (client.connectivity) {
-      case NM.ConnectivityState.NONE:
-      case NM.ConnectivityState.PORTAL:
-      case NM.ConnectivityState.UNKNOWN:
-        return "network-offline-symbolic";
-
-      case NM.ConnectivityState.LIMITED:
-        return "network-no-route-symbolic";
-
-      case NM.ConnectivityState.FULL:
-        // Ignore this case to return the correct device icon below.
-        break;
-
-      default:
-        return unreachable(client.connectivity);
-    }
-
-    const device = client.primaryConnection.get_devices()[0];
-    return getIconNameForDeviceType(device.deviceType);
-  });
+  const networkIcon = createComputed([networkClient], getIconNameForClient);
   const speakerIcon = createComputed(
     [
       createBinding(wireplumber.defaultSpeaker, "mute"),

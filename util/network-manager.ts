@@ -1,6 +1,7 @@
 import NM from "gi://NM";
+import { unreachable } from "./unreachable";
 
-export const getIconNameForDeviceType = (deviceType: NM.DeviceType): string => {
+const getIconNameForDeviceType = (deviceType: NM.DeviceType): string => {
   switch (deviceType) {
     case NM.DeviceType.ETHERNET:
       return "network-wired-symbolic";
@@ -24,7 +25,35 @@ export const getIconNameForDeviceType = (deviceType: NM.DeviceType): string => {
   }
 };
 
-export const getLabelForDeviceType = (deviceType: NM.DeviceType): string => {
+export const getIconNameForClient = (client: NM.Client): string => {
+  switch (client.connectivity) {
+    case NM.ConnectivityState.NONE:
+    case NM.ConnectivityState.PORTAL:
+    case NM.ConnectivityState.UNKNOWN:
+      return "network-offline-symbolic";
+
+    case NM.ConnectivityState.LIMITED:
+      return "network-no-route-symbolic";
+
+    case NM.ConnectivityState.FULL:
+      // Ignore this case to return the correct device icon below.
+      break;
+
+    default:
+      return unreachable(client.connectivity);
+  }
+
+  const device = client.primaryConnection?.get_devices()[0];
+  // `device` should be defined at this point, but still fall back to the
+  // offline icon if there's no `primaryConnection` or no devices.
+  if (!device) {
+    return "network-offline-symbolic";
+  }
+
+  return getIconNameForDeviceType(device.deviceType);
+};
+
+const getLabelForDeviceType = (deviceType: NM.DeviceType): string => {
   switch (deviceType) {
     case NM.DeviceType.ETHERNET:
       return "Ethernet";
@@ -42,4 +71,13 @@ export const getLabelForDeviceType = (deviceType: NM.DeviceType): string => {
     default:
       return "Unknown";
   }
+};
+
+export const getLabelForClient = (client: NM.Client): string => {
+  const device = client.primaryConnection?.get_devices()[0];
+  if (!device) {
+    return "No Network";
+  }
+
+  return getLabelForDeviceType(device.deviceType);
 };
