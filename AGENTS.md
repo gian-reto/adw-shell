@@ -52,7 +52,7 @@ Inside the dev shell, you can use the following commands:
 - **Lint**: `biome check .` (lints with Biome).
 - **Format**: `biome format --write .` (formats code).
 - **Type check**: `tsc` (TypeScript type checking).
-- Generate `@girs` types: `ags types -d "<path-to-this-repo>"`, e.g. `ags types -d "/home/gian/Code/gian-reto/adw-shell"`. Rarely needed, as the types are already generated in the `@girs` directory and regeneration is onlt needed when the used libraries in `flake.nix` change.
+- Generate `@girs` types: `ags types -d "<path-to-this-repo>"`, e.g. `ags types -d "/home/gian/Code/gian-reto/adw-shell"`. Rarely needed, as the types are already generated in the `@girs` directory and regeneration is only needed when the used libraries in `flake.nix` change.
 - DO NOT use `ags run` to test the shell. This command blocks indefinitely and is not suitable for agentic coding.
 
 ## Code Style & Conventions
