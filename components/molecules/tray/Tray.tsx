@@ -8,6 +8,7 @@ import {
   GtkMenuButton,
   type GtkMenuButtonProps,
 } from "../../../widgets/GtkMenuButton";
+import Gio from "gi://Gio";
 
 export type TrayProps = GtkBoxProps & {
   readonly extraItems?: Array<CustomTrayItem["data"]>;
@@ -60,20 +61,34 @@ const TrayItem = (props: TrayItemProps) => {
 
   // Refs
   let itemDataHandlerId: number;
+  let cachedMenuModel: Gio.MenuModel | null = null;
+  let cachedActionGroup: Gio.ActionGroup | null = null;
 
   // Handlers
   const handleDataChanged = (
     self: Gtk.MenuButton,
-    item: AstalTray.TrayItem,
+    item: AstalTray.TrayItem
   ) => {
-    if (!item.menuModel || item.menuModel.get_n_items() < 1) {
+    const menuModel = item.menuModel;
+    const actionGroup = item.actionGroup;
+
+    if (!menuModel || menuModel.get_n_items() < 1) {
       self.set_menu_model(null);
       self.insert_action_group("dbusmenu", null);
+      cachedMenuModel = null;
+      cachedActionGroup = null;
       return;
     }
 
-    self.set_menu_model(item.menuModel);
-    self.insert_action_group("dbusmenu", item.actionGroup);
+    // Only update `menuModel` if the reference actually changed.
+    if (menuModel !== cachedMenuModel) {
+      self.set_menu_model(menuModel);
+      cachedMenuModel = menuModel;
+    }
+    if (actionGroup !== cachedActionGroup) {
+      self.insert_action_group("dbusmenu", actionGroup);
+      cachedActionGroup = actionGroup;
+    }
   };
 
   const handlePressed = (): boolean => {
