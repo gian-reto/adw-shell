@@ -85,18 +85,25 @@
 
     mkDevShellFor = system: let
       pkgs = pkgsFor system;
+      agsPackage = ags.packages.${system}.default.override {
+        inherit extraPackages;
+      };
       extraPackages = mkExtraPackagesFor system;
     in {
       default = pkgs.mkShell {
         buildInputs = [
-          (ags.packages.${system}.default.override {
-            inherit extraPackages;
-          })
+          agsPackage
           pkgs.biome
           pkgs.dart-sass
           pkgs.nodejs
           pkgs.typescript
         ];
+
+        shellHook = ''
+          mkdir -p node_modules
+          rm -f node_modules/ags
+          ln -sf ${agsPackage}/share/ags/js node_modules/ags
+        '';
       };
     };
   in {
