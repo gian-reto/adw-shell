@@ -13,6 +13,7 @@ import {
   ClickableBox,
   type ClickableBoxProps,
 } from "../clickable-box/ClickableBox";
+import { launch } from "../../../util/application";
 
 const apps = new Apps.Apps({
   minScore: 1,
@@ -135,7 +136,7 @@ export const Notification = (props: NotificationProps) => {
         // In all other cases, find the app by name and launch it if possible.
         const app = apps.exact_query(appName).at(0);
         if (app) {
-          app.launch();
+          launch(app);
         }
       }}
       {...restProps}

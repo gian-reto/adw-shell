@@ -9,6 +9,7 @@ import {
 } from "../../hocs/popup-window/PopupWindow";
 import { AppGrid } from "./modes/AppGrid";
 import { AppSearch } from "./modes/AppSearch";
+import { launch } from "../../../util/application";
 
 export type LauncherPopupWindowProps = Omit<
   PopupWindowProps,
@@ -106,7 +107,7 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
                       break;
 
                     case "app-search":
-                      topAppSearchResult.get()?.launch();
+                      launch(topAppSearchResult.get());
                       break;
 
                     default:
@@ -121,7 +122,7 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
                 revealChild={launcherMode.as((value) => value === "app-grid")}
                 window={value}
                 onItemClicked={(_source, app) => {
-                  app.launch();
+                  launch(app);
                   close();
                 }}
               />
@@ -140,7 +141,7 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
                     visible={launcherMode.as((value) => value === "app-search")}
                     window={value}
                     onResultClicked={(_source, app) => {
-                      app.launch();
+                      launch(app);
                       close();
                     }}
                     onResultsChanged={(_self, results) =>
