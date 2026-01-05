@@ -1,5 +1,5 @@
 import AstalTray from "gi://AstalTray";
-import { type Accessor, createBinding, For, onCleanup } from "ags";
+import { type Accessor, createBinding, For } from "ags";
 import { Gtk } from "ags/gtk4";
 import { cx } from "../../../util/cx";
 import { unreachable } from "../../../util/unreachable";
@@ -8,7 +8,6 @@ import {
   GtkMenuButton,
   type GtkMenuButtonProps,
 } from "../../../widgets/GtkMenuButton";
-import Gio from "gi://Gio";
 
 export type TrayProps = GtkBoxProps & {
   readonly extraItems?: Array<CustomTrayItem["data"]>;
@@ -59,38 +58,7 @@ const TrayItem = (props: TrayItemProps) => {
   // Props
   const { class: classOverride, item, ...restProps } = props;
 
-  // Refs
-  let itemDataHandlerId: number;
-  let cachedMenuModel: Gio.MenuModel | null = null;
-  let cachedActionGroup: Gio.ActionGroup | null = null;
-
   // Handlers
-  const handleDataChanged = (
-    self: Gtk.MenuButton,
-    item: AstalTray.TrayItem
-  ) => {
-    const menuModel = item.menuModel;
-    const actionGroup = item.actionGroup;
-
-    if (!menuModel || menuModel.get_n_items() < 1) {
-      self.set_menu_model(null);
-      self.insert_action_group("dbusmenu", null);
-      cachedMenuModel = null;
-      cachedActionGroup = null;
-      return;
-    }
-
-    // Only update `menuModel` if the reference actually changed.
-    if (menuModel !== cachedMenuModel) {
-      self.set_menu_model(menuModel);
-      cachedMenuModel = menuModel;
-    }
-    if (actionGroup !== cachedActionGroup) {
-      self.insert_action_group("dbusmenu", actionGroup);
-      cachedActionGroup = actionGroup;
-    }
-  };
-
   const handlePressed = (): boolean => {
     if (item.type === "custom" && item.data.onClicked) {
       item.data.onClicked();
@@ -100,33 +68,36 @@ const TrayItem = (props: TrayItemProps) => {
     return false;
   };
 
-  // Lifecycle
-  onCleanup(() => {
-    if (item.type === "astal" && itemDataHandlerId) {
-      item.data.disconnect(itemDataHandlerId);
+  // Sets the menu model lazily when the menu is about to be shown.
+  const handleCreatePopup = (self: Gtk.MenuButton) => {
+    switch (item.type) {
+      case "astal":
+        const menuModel = item.data.menuModel;
+        const actionGroup = item.data.actionGroup;
+
+        if (!menuModel || menuModel.get_n_items() < 1) {
+          self.set_menu_model(null);
+          self.insert_action_group("dbusmenu", null);
+          return;
+        }
+
+        self.set_menu_model(menuModel);
+        self.insert_action_group("dbusmenu", actionGroup);
+        break;
+
+      case "custom":
+        // Custom items don't have menus.
+        break;
+
+      default:
+        unreachable(item);
     }
-  });
+  };
 
   return (
     <GtkMenuButton
       $={(self) => {
-        switch (item.type) {
-          case "astal":
-            // Update menu once at the beginning.
-            handleDataChanged(self, item.data);
-
-            itemDataHandlerId = item.data.connect("changed", (item) => {
-              handleDataChanged(self, item);
-            });
-            break;
-
-          case "custom":
-            // Do nothing.
-            break;
-
-          default:
-            unreachable(item);
-        }
+        self.set_create_popup_func(handleCreatePopup);
       }}
       class={cx(
         "bg-transparent min-w-7 min-h-7 p-0 rounded-full transition-colors hover:bg-gray-800",
