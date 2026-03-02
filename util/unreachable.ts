@@ -4,7 +4,7 @@
  * @throws {Error} Always throws an error.
  */
 export const unreachable = (
-  value: never,
+  _value: never,
   messageOrError?: string | Error,
 ): never => {
   const error =

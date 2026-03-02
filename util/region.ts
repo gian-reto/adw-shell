@@ -11,7 +11,7 @@ export const calculateRegion = (
   const [, rect] = widget.compute_bounds(window);
 
   const region = new Cairo.Region();
-  // `unionRectangle` exists but is somehow not typed.
+  // biome-ignore lint/suspicious/noExplicitAny: `unionRectangle` exists but is somehow not typed.
   (region as any).unionRectangle(
     new Cairo.Rectangle({
       x: rect.get_x(),

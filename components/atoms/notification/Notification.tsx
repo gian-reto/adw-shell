@@ -6,6 +6,7 @@ import Pango from "gi://Pango";
 import { createState, onCleanup, With } from "ags";
 import { Gtk } from "ags/gtk4";
 import { createPoll } from "ags/time";
+import { launch } from "../../../util/application";
 import { cx } from "../../../util/cx";
 import { lookUpIcon } from "../../../util/icon";
 import { isPathOfValidImage } from "../../../util/path";
@@ -13,7 +14,6 @@ import {
   ClickableBox,
   type ClickableBoxProps,
 } from "../clickable-box/ClickableBox";
-import { launch } from "../../../util/application";
 
 const apps = new Apps.Apps({
   minScore: 1,

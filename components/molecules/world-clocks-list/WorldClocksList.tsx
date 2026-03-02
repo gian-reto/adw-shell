@@ -1,4 +1,4 @@
-import { Accessor, createState, For, onCleanup } from "ags";
+import { createState, For, onCleanup } from "ags";
 import { Gtk } from "ags/gtk4";
 import { exec } from "ags/process";
 import { createPoll } from "ags/time";

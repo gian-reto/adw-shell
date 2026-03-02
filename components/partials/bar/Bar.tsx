@@ -1,18 +1,17 @@
-import { Accessor, createBinding, createComputed } from "ags";
-import { Astal, Gtk } from "ags/gtk4";
-
-import { ClickableBox } from "../../atoms/clickable-box/ClickableBox";
-import type GObject from "ags/gobject";
-import type { GtkWindowProps } from "../../../widgets/GtkWindow";
 import Network from "gi://AstalNetwork";
-import { Tray } from "../../molecules/tray/Tray";
 import Wireplumber from "gi://AstalWp";
-import { WorkspaceIndicator } from "../../atoms/workspace-indicator/WorkspaceIndicator";
+import { createBinding, createComputed } from "ags";
+import type GObject from "ags/gobject";
+import { Astal, Gtk } from "ags/gtk4";
 import app from "ags/gtk4/app";
-import { createBindingDeep } from "../../../util/binding";
 import { createPoll } from "ags/time";
+import { createBindingDeep } from "../../../util/binding";
 import { cx } from "../../../util/cx";
 import { getIconNameForNetworkClient } from "../../../util/network-manager";
+import type { GtkWindowProps } from "../../../widgets/GtkWindow";
+import { ClickableBox } from "../../atoms/clickable-box/ClickableBox";
+import { WorkspaceIndicator } from "../../atoms/workspace-indicator/WorkspaceIndicator";
+import { Tray } from "../../molecules/tray/Tray";
 
 export type BarProps = Omit<
   GtkWindowProps,

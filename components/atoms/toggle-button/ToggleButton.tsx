@@ -5,10 +5,9 @@ import {
   type Node,
   onCleanup,
   onMount,
-  State,
   With,
 } from "ags";
-import { Astal, Gdk, Gtk } from "ags/gtk4";
+import { Gtk } from "ags/gtk4";
 import { cx } from "../../../util/cx";
 import type { GtkBoxProps } from "../../../widgets/GtkBox";
 import type { GtkImageProps } from "../../../widgets/GtkImage";

@@ -28,10 +28,9 @@ export const Tray = (props: TrayProps) => {
       <For each={trayItems}>
         {(item) => <TrayItem item={{ type: "astal", data: item }} />}
       </For>
-      {extraItems &&
-        extraItems.map((item) => (
-          <TrayItem item={{ type: "custom", data: item }} />
-        ))}
+      {extraItems?.map((item) => (
+        <TrayItem item={{ type: "custom", data: item }} />
+      ))}
     </box>
   );
 };
@@ -71,7 +70,7 @@ const TrayItem = (props: TrayItemProps) => {
   // Sets the menu model lazily when the menu is about to be shown.
   const handleCreatePopup = (self: Gtk.MenuButton) => {
     switch (item.type) {
-      case "astal":
+      case "astal": {
         const menuModel = item.data.menuModel;
         const actionGroup = item.data.actionGroup;
 
@@ -84,6 +83,7 @@ const TrayItem = (props: TrayItemProps) => {
         self.set_menu_model(menuModel);
         self.insert_action_group("dbusmenu", actionGroup);
         break;
+      }
 
       case "custom":
         // Custom items don't have menus.

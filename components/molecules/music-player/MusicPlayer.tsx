@@ -1,7 +1,6 @@
 import Mpris from "gi://AstalMpris";
 import Pango from "gi://Pango";
 import {
-  Accessor,
   createBinding,
   createComputed,
   createState,

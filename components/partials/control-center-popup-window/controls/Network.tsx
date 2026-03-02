@@ -1,8 +1,10 @@
 import Network from "gi://AstalNetwork";
+import AstalNetwork from "gi://AstalNetwork?version=0.1";
 import { type Accessor, createBinding, createComputed, For, With } from "ags";
 import type GObject from "ags/gobject";
 import { Gtk } from "ags/gtk4";
 import { execAsync } from "ags/process";
+import { createBindingDeep } from "../../../../util/binding";
 import { cx } from "../../../../util/cx";
 import {
   getIconNameForNetworkClient,
@@ -15,8 +17,6 @@ import {
   type ToggleButtonMenuProps,
   type ToggleButtonProps,
 } from "../../../atoms/toggle-button/ToggleButton";
-import { createBindingDeep } from "../../../../util/binding";
-import AstalNetwork from "gi://AstalNetwork?version=0.1";
 
 const network = Network.get_default();
 

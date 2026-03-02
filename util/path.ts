@@ -15,7 +15,7 @@ import GLib from "gi://GLib";
  * @returns The normalized path.
  */
 export const expandRelativeHomePathToAbsolute = (path: string): string => {
-  if (path.charAt(0) == "~") {
+  if (path.charAt(0) === "~") {
     // Replace will only replace the first match, in this case, the first character.
     return path.replace("~", GLib.get_home_dir());
   }

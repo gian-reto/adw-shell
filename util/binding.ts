@@ -1,10 +1,11 @@
 import { Accessor } from "ags";
-import GObject from "ags/gobject";
+import type GObject from "ags/gobject";
 
 type SubscribeCallback = () => void;
 type DisposeFunction = () => void;
 type SubscribeFunction = (callback: SubscribeCallback) => DisposeFunction;
 
+// biome-ignore lint/suspicious/noExplicitAny: `any` is actually useful here.
 type AnyFunc = (...args: any[]) => any;
 type NonNullish<T> = Exclude<T, null | undefined>;
 type Join<K extends string, P> = P extends string ? `${K}.${P}` : never;

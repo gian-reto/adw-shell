@@ -1,6 +1,5 @@
 import Bluetooth from "gi://AstalBluetooth";
 import {
-  Accessor,
   createBinding,
   createComputed,
   For,

@@ -113,9 +113,9 @@ export const NotificationCenter = (props: NotificationCenterProps) => {
               valign={Gtk.Align.CENTER}
               vexpand={false}
               onClicked={() => {
-                notifd.notifications.forEach((notification) =>
-                  notification.dismiss(),
-                );
+                notifd.notifications.forEach((notification) => {
+                  notification.dismiss();
+                });
               }}
             >
               Clear All

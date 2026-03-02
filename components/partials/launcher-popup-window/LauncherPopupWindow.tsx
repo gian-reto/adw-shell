@@ -1,6 +1,7 @@
 import Apps from "gi://AstalApps";
 import { createComputed, createState, With } from "ags";
 import { Astal, Gtk } from "ags/gtk4";
+import { launch } from "../../../util/application";
 import { cx } from "../../../util/cx";
 import { unreachable } from "../../../util/unreachable";
 import {
@@ -9,7 +10,6 @@ import {
 } from "../../hocs/popup-window/PopupWindow";
 import { AppGrid } from "./modes/AppGrid";
 import { AppSearch } from "./modes/AppSearch";
-import { launch } from "../../../util/application";
 
 export type LauncherPopupWindowProps = Omit<
   PopupWindowProps,

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.3/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.3.6/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!@girs/**/*", "!/nix/store/**"]
+    "includes": ["**", "!@girs/**/*", "!/nix/store"]
   },
   "formatter": {
     "enabled": true,
@@ -22,8 +22,14 @@
         "noLabelWithoutControl": "off",
         "useButtonType": "off"
       },
+      "complexity": {
+        "noUselessFragments": "off"
+      },
       "correctness": {
         "useJsxKeyInIterable": "off"
+      },
+      "performance": {
+        "noAccumulatingSpread": "off"
       },
       "suspicious": {
         "noReactSpecificProps": "off",

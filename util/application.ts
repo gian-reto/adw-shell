@@ -1,7 +1,7 @@
-import Apps from "gi://AstalApps";
+import type Apps from "gi://AstalApps";
 import { execAsync } from "ags/process";
 
-let isUwsmSession: boolean | undefined = undefined;
+let isUwsmSession: boolean | undefined;
 
 /**
  * Checks if the current session is managed by UWSM. Result is cached after the

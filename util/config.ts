@@ -82,9 +82,7 @@ export const setupConfigListener = (): void => {
  * Executes a configured command by category and name. The command is resolved
  * from the current config at call time.
  */
-export const execConfigCommand = (
-  name: keyof Config["commands"],
-): void => {
+export const execConfigCommand = (name: keyof Config["commands"]): void => {
   const command = config.commands[name];
 
   execAsync(command).catch((error: unknown) => {

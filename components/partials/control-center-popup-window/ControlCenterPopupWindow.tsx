@@ -1,12 +1,7 @@
 import Battery from "gi://AstalBattery";
 import Bluetooth from "gi://AstalBluetooth?version=0.1";
 import Network from "gi://AstalNetwork";
-import {
-  createBinding,
-  createComputed,
-  createState,
-  With,
-} from "ags";
+import { createBinding, createComputed, createState, With } from "ags";
 import { Astal, Gtk } from "ags/gtk4";
 import { execConfigCommand } from "../../../util/config";
 import { cx } from "../../../util/cx";
