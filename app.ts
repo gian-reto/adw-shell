@@ -8,6 +8,7 @@ import { LauncherPopupWindow } from "./components/partials/launcher-popup-window
 import { NotificationCenterPopupWindow } from "./components/partials/notification-center-popup-window/NotificationCenterPopupWindow";
 import { NotificationPopupWindow } from "./components/partials/notification-popup-window/NotificationPopupWindow";
 import { getStylesheet } from "./theme";
+import { setupConfigListener } from "./util/config";
 
 // Track bars by monitor for proper cleanup on hotplug.
 const bars = new Map<Gdk.Monitor, Astal.Window>();
@@ -77,6 +78,7 @@ app.start({
   instanceName: "adw-shell",
   css: getStylesheet("adwaita-dark"),
   main() {
+    setupConfigListener();
     setupMonitorListeners();
 
     ControlCenterPopupWindow({

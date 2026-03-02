@@ -2,14 +2,13 @@ import Battery from "gi://AstalBattery";
 import Bluetooth from "gi://AstalBluetooth?version=0.1";
 import Network from "gi://AstalNetwork";
 import {
-  Accessor,
   createBinding,
   createComputed,
   createState,
   With,
 } from "ags";
-import { Astal, Gdk, Gtk } from "ags/gtk4";
-import { execAsync } from "ags/process";
+import { Astal, Gtk } from "ags/gtk4";
+import { execConfigCommand } from "../../../util/config";
 import { cx } from "../../../util/cx";
 import type { GtkButtonProps } from "../../../widgets/GtkButton";
 import {
@@ -106,35 +105,15 @@ export const ControlCenterPopupWindow = (
                 >
                   <IconButton
                     iconName="applets-screenshooter-symbolic"
-                    onClicked={() => {
-                      execAsync([
-                        "grimblast",
-                        "--notify",
-                        "--freeze",
-                        "copy",
-                        "area",
-                      ]).catch((error: unknown) => {
-                        console.error("Failed to take screenshot: ", error);
-                      });
-                    }}
+                    onClicked={() => execConfigCommand("screenshot")}
                   />
                   <IconButton
                     iconName="system-lock-screen-symbolic"
-                    onClicked={() => {
-                      execAsync(["hyprlock"]).catch((error: unknown) => {
-                        console.error("Failed to lock session: ", error);
-                      });
-                    }}
+                    onClicked={() => execConfigCommand("lock")}
                   />
                   <IconButton
                     iconName="weather-clear-night-symbolic"
-                    onClicked={() => {
-                      execAsync(["systemctl", "suspend"]).catch(
-                        (error: unknown) => {
-                          console.error("Failed to suspend: ", error);
-                        },
-                      );
-                    }}
+                    onClicked={() => execConfigCommand("suspend")}
                   />
                   <IconButton
                     iconName="system-shutdown-symbolic"

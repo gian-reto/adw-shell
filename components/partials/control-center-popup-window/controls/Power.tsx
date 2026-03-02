@@ -1,5 +1,5 @@
 import { Gtk } from "ags/gtk4";
-import { execAsync } from "ags/process";
+import { execConfigCommand } from "../../../../util/config";
 import { cx } from "../../../../util/cx";
 import {
   ToggleButtonMenu,
@@ -17,27 +17,15 @@ export const PowerMenu = (props: PowerMenuProps) => {
   const items = [
     {
       label: "Suspend",
-      onClicked: () => {
-        execAsync(["systemctl", "suspend"]).catch((error: unknown) => {
-          console.error("Failed to suspend the system", error);
-        });
-      },
+      onClicked: () => execConfigCommand("suspend"),
     },
     {
       label: "Restart",
-      onClicked: () => {
-        execAsync(["systemctl", "reboot"]).catch((error: unknown) => {
-          console.error("Failed to restart the system", error);
-        });
-      },
+      onClicked: () => execConfigCommand("restart"),
     },
     {
       label: "Power Off",
-      onClicked: () => {
-        execAsync(["shutdown", "now"]).catch((error: unknown) => {
-          console.error("Failed to power off the system", error);
-        });
-      },
+      onClicked: () => execConfigCommand("shutdown"),
     },
   ];
 
@@ -46,13 +34,7 @@ export const PowerMenu = (props: PowerMenuProps) => {
       footer={
         <PowerMenuItem
           label="Log Out"
-          onClicked={() => {
-            execAsync(["hyprctl", "dispatch", "exit"]).catch(
-              (error: unknown) => {
-                console.error("Failed to log out", error);
-              },
-            );
-          }}
+          onClicked={() => execConfigCommand("log-out")}
         />
       }
       iconName="system-shutdown-symbolic"
