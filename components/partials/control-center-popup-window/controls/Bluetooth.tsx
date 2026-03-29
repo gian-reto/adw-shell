@@ -58,7 +58,11 @@ export const BluetoothToggle = (props: BluetoothToggleProps) => {
       isExpandable
       iconName={iconName}
       label={label}
-      onClicked={() => bluetooth.toggle()}
+      onClicked={() => {
+        if (!bluetooth.get_adapter()) return;
+
+        bluetooth.toggle();
+      }}
       {...props}
     />
   );

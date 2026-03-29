@@ -46,13 +46,25 @@ export const ControlCenterPopupWindow = (
   const powerPercentage = createComputed([isBattery, batteryPercentage]).as(
     ([isBattery, percentage]) => (isBattery ? `${percentage * 100}%` : "100%"),
   );
+  const hasBluetoothAdapter = createBinding(bluetooth, "adapter").as(
+    (adapter) => adapter !== null,
+  );
   const isBluetoothPowered = createBinding(bluetooth, "isPowered");
   const isBluetoothConnected = createBinding(bluetooth, "isConnected");
   const isBluetoothPoweredOrConnected = createComputed(
     [isBluetoothPowered, isBluetoothConnected],
     (isPowered, isConnected) => isPowered || isConnected,
   );
+  const isBluetoothMenuExpanded = createComputed(
+    [hasBluetoothAdapter, expandedMenu],
+    (hasBluetoothAdapter, expandedMenu) =>
+      hasBluetoothAdapter && expandedMenu === "bluetooth",
+  );
   const isWifiEnabled = createBinding(network.wifi, "enabled");
+  const isWifiMenuExpanded = createComputed(
+    [expandedMenu],
+    (expandedMenu) => expandedMenu === "network",
+  );
 
   return (
     <PopupWindow
@@ -132,23 +144,30 @@ export const ControlCenterPopupWindow = (
               </box>
               <box class="mt-4 space-x-2.5" homogeneous>
                 <NetworkToggle
-                  isExpanded={expandedMenu.as((value) => value === "network")}
+                  isExpanded={isWifiMenuExpanded}
                   onCollapsed={() => setExpandedMenu("none")}
                   onExpanded={() => setExpandedMenu("network")}
                 />
                 <BluetoothToggle
-                  isExpanded={expandedMenu.as((value) => value === "bluetooth")}
+                  isExpanded={isBluetoothMenuExpanded}
                   onCollapsed={() => setExpandedMenu("none")}
                   onExpanded={() => setExpandedMenu("bluetooth")}
+                  sensitive={hasBluetoothAdapter}
                 />
               </box>
-              <BluetoothMenu
-                isActive={isBluetoothPoweredOrConnected}
-                revealChild={expandedMenu.as((value) => value === "bluetooth")}
-              />
+              <With value={hasBluetoothAdapter}>
+                {(value) =>
+                  value && (
+                    <BluetoothMenu
+                      isActive={isBluetoothPoweredOrConnected}
+                      revealChild={isBluetoothMenuExpanded}
+                    />
+                  )
+                }
+              </With>
               <NetworkMenu
                 isActive={isWifiEnabled}
-                revealChild={expandedMenu.as((value) => value === "network")}
+                revealChild={isWifiMenuExpanded}
               />
               <box class="mt-3 space-x-2.5" homogeneous>
                 <MicrophoneToggle />
