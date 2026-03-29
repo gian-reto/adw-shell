@@ -44,7 +44,8 @@ export const ControlCenterPopupWindow = (
     ([isBattery, iconName]) => (isBattery ? iconName : "ac-adapter-symbolic"),
   );
   const powerPercentage = createComputed([isBattery, batteryPercentage]).as(
-    ([isBattery, percentage]) => (isBattery ? `${percentage * 100}%` : "100%"),
+    ([isBattery, percentage]) =>
+      isBattery ? `${Math.round(percentage * 100)}%` : "100%",
   );
   const hasBluetoothAdapter = createBinding(bluetooth, "adapter").as(
     (adapter) => adapter !== null,
