@@ -32,7 +32,7 @@ export const lookUpIcon = (
     size,
     scale,
     Gtk.TextDirection.NONE,
-    null,
+    Gtk.IconLookupFlags.NONE,
   );
 };
 

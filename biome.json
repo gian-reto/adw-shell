@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.6/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -32,8 +32,9 @@
         "noAccumulatingSpread": "off"
       },
       "suspicious": {
-        "noReactSpecificProps": "off",
-        "noConsole": "off"
+        "noConsole": "off",
+        "noDeprecatedImports": "error",
+        "noReactSpecificProps": "off"
       },
       "style": {
         "noNonNullAssertion": "off",

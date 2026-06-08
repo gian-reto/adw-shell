@@ -40,12 +40,11 @@ export const ControlCenterPopupWindow = (
   const isBattery = createBinding(battery, "isBattery");
   const batteryIconName = createBinding(battery, "iconName");
   const batteryPercentage = createBinding(battery, "percentage");
-  const powerIconName = createComputed([isBattery, batteryIconName]).as(
-    ([isBattery, iconName]) => (isBattery ? iconName : "ac-adapter-symbolic"),
+  const powerIconName = createComputed(() =>
+    isBattery() ? batteryIconName() : "ac-adapter-symbolic",
   );
-  const powerPercentage = createComputed([isBattery, batteryPercentage]).as(
-    ([isBattery, percentage]) =>
-      isBattery ? `${Math.round(percentage * 100)}%` : "100%",
+  const powerPercentage = createComputed(() =>
+    isBattery() ? `${Math.round(batteryPercentage() * 100)}%` : "100%",
   );
   const hasBluetoothAdapter = createBinding(bluetooth, "adapter").as(
     (adapter) => adapter !== null,
@@ -53,19 +52,15 @@ export const ControlCenterPopupWindow = (
   const isBluetoothPowered = createBinding(bluetooth, "isPowered");
   const isBluetoothConnected = createBinding(bluetooth, "isConnected");
   const isBluetoothPoweredOrConnected = createComputed(
-    [isBluetoothPowered, isBluetoothConnected],
-    (isPowered, isConnected) => isPowered || isConnected,
+    () => isBluetoothPowered() || isBluetoothConnected(),
   );
   const isBluetoothMenuExpanded = createComputed(
-    [hasBluetoothAdapter, expandedMenu],
-    (hasBluetoothAdapter, expandedMenu) =>
-      hasBluetoothAdapter && expandedMenu === "bluetooth",
+    () => hasBluetoothAdapter() && expandedMenu() === "bluetooth",
   );
-  const isWifiEnabled = createBinding(network.wifi, "enabled");
-  const isWifiMenuExpanded = createComputed(
-    [expandedMenu],
-    (expandedMenu) => expandedMenu === "network",
+  const isWifiEnabled = createBinding(network, "wifi", "enabled").as(
+    (enabled) => enabled ?? false,
   );
+  const isWifiMenuExpanded = createComputed(() => expandedMenu() === "network");
 
   return (
     <PopupWindow
@@ -126,7 +121,7 @@ export const ControlCenterPopupWindow = (
                   <IconButton
                     iconName="system-shutdown-symbolic"
                     onClicked={() =>
-                      expandedMenu.get() === "power"
+                      expandedMenu.peek() === "power"
                         ? setExpandedMenu("none")
                         : setExpandedMenu("power")
                     }

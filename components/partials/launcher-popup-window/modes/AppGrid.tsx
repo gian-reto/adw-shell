@@ -26,12 +26,15 @@ export const AppGrid = (props: AppGridProps) => {
   // State
   const [clickCount, setClickCount] = createState(0);
   const appsList = createBinding(apps, "list");
-  const chunkedSortedApps = createComputed([appsList, clickCount], (value) =>
-    chunk(
-      value.sort((a, b) => b.frequency - a.frequency),
+  const chunkedSortedApps = createComputed(() => {
+    // Recompute when `clickCount` changes, to update the order based on frequency.
+    clickCount();
+
+    return chunk(
+      appsList().sort((a, b) => b.frequency - a.frequency),
       6,
-    ),
-  );
+    );
+  });
 
   return (
     <revealer {...restProps}>
@@ -73,7 +76,7 @@ export const AppGrid = (props: AppGridProps) => {
                     onClicked={(self, app) => {
                       onItemClicked?.(self, app);
 
-                      setClickCount((count) => count++);
+                      setClickCount((count) => count + 1);
                     }}
                   />
                 ))}

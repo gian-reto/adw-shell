@@ -2,10 +2,10 @@
   description = "AGS-based shell in default libadwaita style";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     ags = {
-      url = "github:aylur/ags/7d6493656c160bedde29716e3eb391180ad538b1";
+      url = "github:aylur/ags/bbee2f18939f1ec7ff720e717cf305e73635628f";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -35,6 +35,7 @@
         mpris
         network
         notifd
+        powerprofiles
         tray
         wireplumber
       ];

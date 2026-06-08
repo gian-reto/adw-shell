@@ -155,11 +155,9 @@ const ContentBox = (props: ContentBoxProps) => {
     positionOverride instanceof Accessor
       ? positionOverride
       : new Accessor(() => positionOverride);
-  const alignment = createComputed([popupPosition], (value) =>
-    positionToAlignment(value),
-  );
-  const halign = createComputed([alignment], (value) => value.halign);
-  const valign = createComputed([alignment], (value) => value.valign);
+  const alignment = createComputed(() => positionToAlignment(popupPosition()));
+  const halign = createComputed(() => alignment().halign);
+  const valign = createComputed(() => alignment().valign);
 
   return (
     <box
@@ -226,8 +224,8 @@ const PopupRevealer = (props: PopupRevealerProps) => {
   } = props;
 
   // State
-  const transitionType = createComputed([popupPosition], (value) =>
-    positionToRevealerTransitionType(value),
+  const transitionType = createComputed(() =>
+    positionToRevealerTransitionType(popupPosition()),
   );
 
   return (

@@ -278,7 +278,7 @@ const formatTimeRelative = (time: number): string => {
   const then = GLib.DateTime.new_from_unix_local(time);
 
   // Convert microseconds to seconds.
-  const diff = now.difference(then) / 1_000_000;
+  const diff = Number(now.difference(then)) / 1_000_000;
 
   if (diff < 60) {
     return "Just now";

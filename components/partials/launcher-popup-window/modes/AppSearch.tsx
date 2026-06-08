@@ -70,27 +70,27 @@ export const AppSearch = (props: AppSearchProps) => {
 
   // Subscribe to search term changes and debounce them
   const searchTermUnsubscriber = searchTerm.subscribe(() => {
-    updateDebouncedSearchTerm(searchTerm.get());
+    updateDebouncedSearchTerm(searchTerm.peek());
   });
 
-  const scoredApps = createComputed(
-    [appsList, debouncedSearchTerm, clickCount],
-    (appsList, term) =>
-      new Map(
-        appsList.map((app) => [
-          app.name,
-          {
-            data: app,
-            score: apps.fuzzy_score(term, app),
-          },
-        ]),
-      ),
-  );
+  const scoredApps = createComputed(() => {
+    // Recompute when `clickCount` changes, to update the order based on frequency.
+    clickCount();
+
+    return new Map(
+      appsList().map((app) => [
+        app.name,
+        {
+          data: app,
+          score: apps.fuzzy_score(debouncedSearchTerm(), app),
+        },
+      ]),
+    );
+  });
   const searchResults = createComputed(
-    [scoredApps],
-    (scoredApps) =>
+    () =>
       new Set(
-        [...scoredApps.values()]
+        [...scoredApps().values()]
           .sort((a, b) => b.score - a.score)
           .filter((app) => app.score > 0)
           .slice(0, MAX_RESULTS)
@@ -105,8 +105,8 @@ export const AppSearch = (props: AppSearchProps) => {
 
     onResultsChanged?.(
       selfRef,
-      [...searchResults.get().values()].flatMap((result) => {
-        const app = scoredApps.get().get(result);
+      [...searchResults.peek().values()].flatMap((result) => {
+        const app = scoredApps.peek().get(result);
         if (!app) return [];
 
         return [
@@ -138,8 +138,8 @@ export const AppSearch = (props: AppSearchProps) => {
 
         self.set_sort_func(
           (a, b) =>
-            (scoredApps.get().get(b.get_name())?.score ?? 0) -
-            (scoredApps.get().get(a.get_name())?.score ?? 0),
+            (scoredApps.peek().get(b.get_name())?.score ?? 0) -
+            (scoredApps.peek().get(a.get_name())?.score ?? 0),
         );
       }}
       class={cx("bg-transparent", classOverride)}
@@ -163,7 +163,7 @@ export const AppSearch = (props: AppSearchProps) => {
                 onClicked={(self) => {
                   onResultClicked?.(self, app);
 
-                  setClickCount((count) => count++);
+                  setClickCount((count) => count + 1);
                 }}
               />
             </revealer>

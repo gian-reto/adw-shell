@@ -1,5 +1,5 @@
-import Cairo from "gi://cairo";
 import type { Gtk } from "ags/gtk4";
+import Cairo from "cairo";
 
 /**
  * Returns the {@link Cairo.Region} of the given widget within the given window.
@@ -11,15 +11,12 @@ export const calculateRegion = (
   const [, rect] = widget.compute_bounds(window);
 
   const region = new Cairo.Region();
-  // biome-ignore lint/suspicious/noExplicitAny: `unionRectangle` exists but is somehow not typed.
-  (region as any).unionRectangle(
-    new Cairo.Rectangle({
-      x: rect.get_x(),
-      y: rect.get_y(),
-      width: rect.get_width(),
-      height: rect.get_height(),
-    }),
-  );
+  region.unionRectangle({
+    x: Math.floor(rect.get_x()),
+    y: Math.floor(rect.get_y()),
+    width: Math.ceil(rect.get_width()),
+    height: Math.ceil(rect.get_height()),
+  });
 
   return region;
 };

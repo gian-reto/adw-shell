@@ -22,9 +22,9 @@ export const WorldClocksList = (props: WorldClocksListProps) => {
 
   // State
   const dateTime = createPoll("", 1000, 'date --iso-8601="minutes"');
-  const [currentDateTime, setCurrentDateTime] = createState(dateTime.get());
+  const [currentDateTime, setCurrentDateTime] = createState(dateTime.peek());
   const [worldClocks, setWorldClocks] = createState<Array<WorldClock>>(
-    getWorldClocks(currentDateTime.get()),
+    getWorldClocks(currentDateTime.peek()),
   );
 
   // Lifecycle
@@ -43,10 +43,10 @@ export const WorldClocksList = (props: WorldClocksListProps) => {
 
         if (source.visible) {
           dateTimeUnsubscriber = dateTime.subscribe(() => {
-            const newDateTime = dateTime.get();
+            const newDateTime = dateTime.peek();
 
             // Only update the world clocks if the UTC date time has changed.
-            if (currentDateTime.get() !== newDateTime) {
+            if (currentDateTime.peek() !== newDateTime) {
               setCurrentDateTime(newDateTime);
               setWorldClocks(getWorldClocks(newDateTime));
             }

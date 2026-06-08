@@ -32,9 +32,9 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
     Apps.Application | undefined
   >(undefined);
   const [entryText, setEntryText] = createState("");
-  const entryDirty = createComputed([entryText], (value) => value !== "");
-  const launcherMode = createComputed([entryText], (value) => {
-    if (value === "") {
+  const entryDirty = createComputed(() => entryText() !== "");
+  const launcherMode = createComputed(() => {
+    if (entryText() === "") {
       return "app-grid";
     }
 
@@ -43,7 +43,7 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
 
   // Handlers
   const close = () => {
-    window?.get()?.set_visible(false);
+    window?.peek()?.set_visible(false);
   };
 
   const focusEntry = () => {
@@ -99,7 +99,7 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
                 valign={Gtk.Align.START}
                 vexpand={false}
                 onActivate={(_self) => {
-                  const currentLauncherMode = launcherMode.get();
+                  const currentLauncherMode = launcherMode.peek();
 
                   switch (currentLauncherMode) {
                     case "app-grid":
@@ -107,7 +107,7 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
                       break;
 
                     case "app-search":
-                      launch(topAppSearchResult.get());
+                      launch(topAppSearchResult.peek());
                       break;
 
                     default:

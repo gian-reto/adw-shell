@@ -52,13 +52,13 @@ function cx(
   // subscribed to all of them, and returns the joined static class names along
   // with the current values of the accessors in the correct positions.
   if (accessors.length > 0) {
-    return createComputed(accessors, (...values) => {
+    return createComputed(() => {
       const currentClasses: string[] = [];
 
       let accessorIndex = 0;
       for (const className of classNames) {
         if (className === ACCESSOR_PLACEHOLDER) {
-          currentClasses.push(cx(values[accessorIndex++]));
+          currentClasses.push(cx(accessors[accessorIndex++]()));
           continue;
         }
 

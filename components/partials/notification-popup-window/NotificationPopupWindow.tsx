@@ -56,10 +56,7 @@ export const NotificationPopupWindow = (
   const [notification, setNotification] = createState<
     Notifd.Notification | undefined
   >(undefined);
-  const displayData = createComputed(
-    [window, notification],
-    (...values) => values,
-  );
+  const displayData = createComputed(() => [window(), notification()] as const);
 
   // Handlers
   const hideSelfImmediate = () => {
@@ -87,7 +84,7 @@ export const NotificationPopupWindow = (
       constrainWindowBoundsTimeoutRef?.cancel();
 
       // If another notification is already visible, hide it first.
-      if (notification.get()) {
+      if (notification.peek()) {
         hideSelfImmediate();
       }
 
@@ -100,11 +97,11 @@ export const NotificationPopupWindow = (
       // for the revealer to finish its transition before being able to
       // correctly compute the bounds of the notification widget.
       constrainWindowBoundsTimeoutRef = timeout(TRANSITION_DURATION_MS, () => {
-        const currentWindow = window.get();
+        const currentWindow = window.peek();
         if (!currentWindow || !revealerRef) return;
 
         const region = calculateRegion(currentWindow, revealerRef);
-        window.get()?.get_surface()?.set_input_region(region);
+        window.peek()?.get_surface()?.set_input_region(region);
       });
 
       // Auto-hide the notification after a while.

@@ -102,6 +102,7 @@ app.connect("request", (_self, argv, response) => {
   switch (cmd) {
     case "toggle-launcher":
       app.toggle_window("launcher");
+      response("");
       break;
     default:
       response("Unknown command");

@@ -32,24 +32,17 @@ export const BluetoothToggle = (props: BluetoothToggleProps) => {
   // State
   const isPowered = createBinding(bluetooth, "isPowered");
   const isConnected = createBinding(bluetooth, "isConnected");
-  const isActive = createComputed(
-    [isPowered, isConnected],
-    (isPowered, isConnected) => isPowered || isConnected,
-  );
+  const isActive = createComputed(() => isPowered() || isConnected());
   const connectedDevice = createBinding(bluetooth, "devices").as((devices) =>
     devices.length > 0 ? devices.find((device) => device.connected) : undefined,
   );
-  const iconName = createComputed(
-    [isPowered, isConnected],
-    (isPowered, isConnected) =>
-      isPowered || isConnected
-        ? "bluetooth-active-symbolic"
-        : "bluetooth-disabled-symbolic",
+  const iconName = createComputed(() =>
+    isPowered() || isConnected()
+      ? "bluetooth-active-symbolic"
+      : "bluetooth-disabled-symbolic",
   );
   const label = createComputed(
-    [connectedDevice, isPowered],
-    (connectedDevice, isPowered) =>
-      connectedDevice?.alias || (isPowered ? "Bluetooth" : "Disabled"),
+    () => connectedDevice()?.alias || (isPowered() ? "Bluetooth" : "Disabled"),
   );
 
   return (
@@ -78,7 +71,9 @@ export const BluetoothMenu = (props: BluetoothMenuProps) => {
   const { onNotifyRevealChild, ...restProps } = props;
 
   // State
-  const isDiscovering = createBinding(bluetooth.adapter, "discovering");
+  const isDiscovering = createBinding(bluetooth, "adapter", "discovering").as(
+    (discovering) => discovering ?? false,
+  );
   const devices = createBinding(bluetooth, "devices").as((value) =>
     value
       .filter((device) => !!device.name && !device.blocked)
@@ -102,11 +97,12 @@ export const BluetoothMenu = (props: BluetoothMenuProps) => {
       ) => {
         onNotifyRevealChild?.(source, pspec);
 
-        if (!bluetooth.adapter.powered) return;
+        const adapter = bluetooth.adapter;
+        if (!adapter?.powered) return;
 
-        if (source.revealChild && !bluetooth.adapter.discovering) {
+        if (source.revealChild && !adapter.discovering) {
           try {
-            bluetooth.adapter.start_discovery();
+            adapter.start_discovery();
           } catch (error: unknown) {
             console.error(
               "Failed to start bluetooth discovery. Trigger: revealer expanded. Error: ",
@@ -116,8 +112,8 @@ export const BluetoothMenu = (props: BluetoothMenuProps) => {
           return;
         }
 
-        if (!source.revealChild && bluetooth.adapter.discovering) {
-          bluetooth.adapter.stop_discovery();
+        if (!source.revealChild && adapter.discovering) {
+          adapter.stop_discovery();
         }
       }}
       title="Bluetooth"

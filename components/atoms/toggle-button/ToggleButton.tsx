@@ -67,7 +67,7 @@ export const ToggleButton = (props: ToggleButtonProps) => {
   onMount(() => {
     if (typeof isExpandedOverride !== "boolean") {
       isExpandedOverrideUnsubscriber = isExpandedOverride.subscribe(() => {
-        setExpanded(isExpandedOverride.get());
+        setExpanded(isExpandedOverride.peek());
       });
     }
   });
@@ -131,7 +131,7 @@ export const ToggleButton = (props: ToggleButtonProps) => {
               valign={Gtk.Align.FILL}
               vexpand={false}
               onClicked={(self) => {
-                const newExpandedState = !isExpanded.get();
+                const newExpandedState = !isExpanded.peek();
 
                 setExpanded(newExpandedState);
 
@@ -300,4 +300,5 @@ const ToggleButtonMenuItem = (props: ToggleButtonMenuItemProps) => {
 };
 
 ToggleButtonMenu.Item = ToggleButtonMenuItem;
+
 export { ToggleButtonMenu };

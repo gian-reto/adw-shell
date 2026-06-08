@@ -28,7 +28,7 @@ export const VolumeSlider = (props: VolumeSliderProps) => {
       return;
     }
 
-    scaleRef.set_value(volume.get());
+    scaleRef.set_value(volume.peek());
   };
 
   // Lifecycle

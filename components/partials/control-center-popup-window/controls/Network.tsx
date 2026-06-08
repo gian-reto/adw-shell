@@ -4,7 +4,6 @@ import { type Accessor, createBinding, createComputed, For, With } from "ags";
 import type GObject from "ags/gobject";
 import { Gtk } from "ags/gtk4";
 import { execAsync } from "ags/process";
-import { createBindingDeep } from "../../../../util/binding";
 import { cx } from "../../../../util/cx";
 import {
   getIconNameForNetworkClient,
@@ -27,37 +26,39 @@ export type NetworkToggleProps = Omit<
 
 export const NetworkToggle = (props: NetworkToggleProps) => {
   // State
-  const networkClientConnectivity = createBindingDeep(
+  const networkClientConnectivity = createBinding(
     network,
-    "client.connectivity",
+    "client",
+    "connectivity",
   );
-  const networkClientPrimaryConnection = createBindingDeep(
+  const networkClientPrimaryConnection = createBinding(
     network,
-    "client.primaryConnection",
+    "client",
+    "primaryConnection",
   );
   const networkIsWifi = createBinding(network, "primary").as(
     (primary) => primary === AstalNetwork.Primary.WIFI,
   );
-  const networkWifiEnabled = createBindingDeep(network, "wifi.enabled");
-  const networkWifiSsid = createBindingDeep(network, "wifi.ssid");
-  const iconName = createComputed(
-    [networkClientConnectivity, networkClientPrimaryConnection],
-    (connectivity, primaryConnection) =>
-      getIconNameForNetworkClient({ connectivity, primaryConnection }),
+  const networkWifiEnabled = createBinding(network, "wifi", "enabled").as(
+    (enabled) => enabled ?? false,
   );
-  const label = createComputed(
-    [networkClientPrimaryConnection, networkIsWifi, networkWifiSsid],
-    (primaryConnection, isWifi, wifiSsid) => {
-      // Show the Wi-Fi SSID if the primary connection is Wi-Fi.
-      if (isWifi) {
-        return wifiSsid;
-      }
+  const networkWifiSsid = createBinding(network, "wifi", "ssid");
+  const iconName = createComputed(() =>
+    getIconNameForNetworkClient({
+      connectivity: networkClientConnectivity(),
+      primaryConnection: networkClientPrimaryConnection(),
+    }),
+  );
+  const label = createComputed(() => {
+    // Show the Wi-Fi SSID if the primary connection is Wi-Fi.
+    if (networkIsWifi()) {
+      return networkWifiSsid() ?? "Wi-Fi";
+    }
 
-      return getLabelForNetworkClient({
-        primaryConnection,
-      });
-    },
-  );
+    return getLabelForNetworkClient({
+      primaryConnection: networkClientPrimaryConnection(),
+    });
+  });
 
   return (
     <ToggleButton
@@ -67,7 +68,10 @@ export const NetworkToggle = (props: NetworkToggleProps) => {
       label={label}
       sensitive={networkWifiEnabled}
       onClicked={(_self) => {
-        network.wifi.enabled = !network.wifi.enabled;
+        const wifi = network.wifi;
+        if (!wifi) return;
+
+        wifi.enabled = !wifi.enabled;
       }}
       {...props}
     />
@@ -84,12 +88,15 @@ export const NetworkMenu = (props: NetworkMenuProps) => {
   const { onNotifyRevealChild, ...restProps } = props;
 
   // State
-  const networkWifiScanning = createBindingDeep(network, "wifi.scanning");
-  const networkWifiAccessPoints = createBindingDeep(
+  const networkWifiScanning = createBinding(network, "wifi", "scanning").as(
+    (scanning) => scanning ?? false,
+  );
+  const networkWifiAccessPoints = createBinding(
     network,
-    "wifi.accessPoints",
+    "wifi",
+    "accessPoints",
   ).as((accessPoints) =>
-    accessPoints
+    (accessPoints ?? [])
       .reduce<Array<Network.AccessPoint>>((acc, accessPoint) => {
         return acc.some((ap) => ap.ssid === accessPoint.ssid)
           ? acc
@@ -100,9 +107,10 @@ export const NetworkMenu = (props: NetworkMenuProps) => {
       .sort((a, b) => b.strength - a.strength)
       .slice(0, 10),
   );
-  const networkWifiActiveAccessPoint = createBindingDeep(
+  const networkWifiActiveAccessPoint = createBinding(
     network,
-    "wifi.activeAccessPoint",
+    "wifi",
+    "activeAccessPoint",
   );
 
   return (
@@ -115,10 +123,11 @@ export const NetworkMenu = (props: NetworkMenuProps) => {
       ) => {
         onNotifyRevealChild?.(source, pspec);
 
-        if (!network.wifi.enabled) return;
+        const wifi = network.wifi;
+        if (!wifi?.enabled) return;
 
         if (source.revealChild) {
-          network.wifi.scan();
+          wifi.scan();
         }
       }}
       title="Wi-Fi"
@@ -147,7 +156,7 @@ export const NetworkMenu = (props: NetworkMenuProps) => {
 
 type NetworkMenuItemProps = ToggleButtonMenuItemProps & {
   readonly accessPoint: Network.AccessPoint;
-  readonly activeAccessPoint: Accessor<Network.AccessPoint>;
+  readonly activeAccessPoint: Accessor<Network.AccessPoint | null>;
 };
 
 const NetworkMenuItem = (props: NetworkMenuItemProps) => {
@@ -163,10 +172,7 @@ const NetworkMenuItem = (props: NetworkMenuItemProps) => {
   // State
   const iconName = createBinding(accessPoint, "iconName");
   const ssid = createBinding(accessPoint, "ssid");
-  const isActive = createComputed(
-    [activeAccessPoint],
-    (value) => accessPoint === value,
-  );
+  const isActive = createComputed(() => accessPoint === activeAccessPoint());
 
   return (
     <ToggleButtonMenu.Item
@@ -174,22 +180,21 @@ const NetworkMenuItem = (props: NetworkMenuItemProps) => {
       onClicked={(self) => {
         onClicked?.(self);
 
-        if (isActive.get()) {
-          execAsync(["nmcli", "connection", "down", accessPoint.ssid]).catch(
+        const ssid = accessPoint.ssid;
+        if (!ssid) return;
+
+        if (isActive.peek()) {
+          execAsync(["nmcli", "connection", "down", ssid]).catch(
             (error: unknown) => {
               console.error("Failed to disconnect from network: ", error);
             },
           );
         } else {
-          execAsync([
-            "nmcli",
-            "device",
-            "wifi",
-            "connect",
-            accessPoint.ssid,
-          ]).catch((error: unknown) => {
-            console.error("Failed to connect to network: ", error);
-          });
+          execAsync(["nmcli", "device", "wifi", "connect", ssid]).catch(
+            (error: unknown) => {
+              console.error("Failed to connect to network: ", error);
+            },
+          );
         }
       }}
       {...restProps}
@@ -202,7 +207,7 @@ const NetworkMenuItem = (props: NetworkMenuItemProps) => {
         vexpand={false}
       />
       <label
-        label={ssid}
+        label={ssid.as((ssid) => ssid ?? "Unknown SSID")}
         halign={Gtk.Align.START}
         hexpand
         valign={Gtk.Align.CENTER}

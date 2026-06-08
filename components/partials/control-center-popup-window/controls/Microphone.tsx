@@ -16,14 +16,12 @@ export const MicrophoneToggle = (props: MicrophoneToggleProps) => {
 
   // State
   const isMuted = createBinding(wireplumber.defaultMicrophone, "mute");
-  const iconName = createComputed([isMuted], (value) =>
-    value
+  const iconName = createComputed(() =>
+    isMuted()
       ? "microphone-disabled-symbolic"
       : "microphone-sensitivity-high-symbolic",
   );
-  const label = createComputed([isMuted], (value) =>
-    value ? "Muted" : "Unmuted",
-  );
+  const label = createComputed(() => (isMuted() ? "Muted" : "Unmuted"));
 
   return (
     <ToggleButton

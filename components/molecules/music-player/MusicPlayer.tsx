@@ -38,7 +38,7 @@ export const MusicPlayer = (props: MusicPlayerProps) => {
       );
 
     if (player) {
-      if (player !== currentPlayer.get()) {
+      if (player !== currentPlayer.peek()) {
         setCurrentPlayer(player);
       }
     } else {
@@ -88,12 +88,7 @@ const MusicPlayerBox = (props: MusicPlayerBoxProps) => {
   const canGoPrevious = createBinding(player, "canGoPrevious");
   const canPause = createBinding(player, "canPause");
   const canPlay = createBinding(player, "canPlay");
-  const canPlayOrPause = createComputed(
-    [canPlay, canPause],
-    (canPlay, canPause) => {
-      return canPlay || canPause;
-    },
-  );
+  const canPlayOrPause = createComputed(() => canPlay() || canPause());
   const coverArt = createBinding(player, "coverArt");
   const playbackStatus = createBinding(player, "playbackStatus");
   const title = createBinding(player, "title");

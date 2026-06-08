@@ -5,7 +5,6 @@ import type GObject from "ags/gobject";
 import { Astal, Gtk } from "ags/gtk4";
 import app from "ags/gtk4/app";
 import { createPoll } from "ags/time";
-import { createBindingDeep } from "../../../util/binding";
 import { cx } from "../../../util/cx";
 import { getIconNameForNetworkClient } from "../../../util/network-manager";
 import type { GtkWindowProps } from "../../../widgets/GtkWindow";
@@ -34,32 +33,46 @@ export default function Bar(props: BarProps): GObject.Object {
 
   // State
   const dateTime = createPoll("", 1000, 'date --iso-8601="minutes"');
-  const networkClientConnectivity = createBindingDeep(
+  const networkClientConnectivity = createBinding(
     network,
-    "client.connectivity",
+    "client",
+    "connectivity",
   );
-  const networkClientPrimaryConnection = createBindingDeep(
+  const networkClientPrimaryConnection = createBinding(
     network,
-    "client.primaryConnection",
+    "client",
+    "primaryConnection",
   );
-  const networkIcon = createComputed(
-    [networkClientConnectivity, networkClientPrimaryConnection],
-    (connectivity, primaryConnection) =>
-      getIconNameForNetworkClient({ connectivity, primaryConnection }),
+  const networkIcon = createComputed(() =>
+    getIconNameForNetworkClient({
+      connectivity: networkClientConnectivity(),
+      primaryConnection: networkClientPrimaryConnection(),
+    }),
   );
-  const speakerIcon = createComputed(
-    [
-      createBinding(wireplumber.defaultSpeaker, "mute"),
-      createBinding(wireplumber.defaultSpeaker, "volumeIcon"),
-    ],
-    (mute, volumeIcon) => (mute ? "audio-volume-muted-symbolic" : volumeIcon),
+  const defaultSpeakerMute = createBinding(
+    wireplumber,
+    "defaultSpeaker",
+    "mute",
   );
-  const microphoneIcon = createComputed(
-    [createBinding(wireplumber.defaultMicrophone, "mute")],
-    (mute) =>
-      mute
-        ? "microphone-disabled-symbolic"
-        : "microphone-sensitivity-high-symbolic",
+  const defaultSpeakerVolumeIcon = createBinding(
+    wireplumber,
+    "defaultSpeaker",
+    "volumeIcon",
+  );
+  const speakerIcon = createComputed(() =>
+    defaultSpeakerMute()
+      ? "audio-volume-muted-symbolic"
+      : defaultSpeakerVolumeIcon(),
+  );
+  const defaultMicrophoneMute = createBinding(
+    wireplumber,
+    "defaultMicrophone",
+    "mute",
+  );
+  const microphoneIcon = createComputed(() =>
+    defaultMicrophoneMute()
+      ? "microphone-disabled-symbolic"
+      : "microphone-sensitivity-high-symbolic",
   );
 
   return (
