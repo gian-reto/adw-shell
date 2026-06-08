@@ -145,19 +145,7 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
                       close();
                     }}
                     onResultsChanged={(_self, results) =>
-                      setTopAppSearchResult(
-                        results.reduce<
-                          | {
-                              readonly data: Apps.Application;
-                              readonly score: number;
-                            }
-                          | undefined
-                        >(
-                          (acc, curr) =>
-                            (acc?.score ?? 0) > curr.score ? acc : curr,
-                          undefined,
-                        )?.data,
-                      )
+                      setTopAppSearchResult(results[0])
                     }
                   />
                 </box>

@@ -24,10 +24,7 @@ export type AppSearchProps = GtkListBoxProps &
     ) => void;
     readonly onResultsChanged?: (
       self: Gtk.ListBox,
-      results: ReadonlyArray<{
-        readonly data: Apps.Application;
-        readonly score: number;
-      }>,
+      results: ReadonlyArray<Apps.Application>,
     ) => void;
   };
 
@@ -89,13 +86,13 @@ export const AppSearch = (props: AppSearchProps) => {
   });
   const searchResults = createComputed(
     () =>
-      new Set(
+      new Map(
         [...scoredApps().values()]
           .sort((a, b) => b.score - a.score)
           .filter((app) => app.score > 0)
           .slice(0, MAX_RESULTS)
           .sort((a, b) => b.data.frequency - a.data.frequency)
-          .map((app) => app.data.name),
+          .map((app, index) => [app.data.name, index] as const),
       ),
   );
 
@@ -105,16 +102,11 @@ export const AppSearch = (props: AppSearchProps) => {
 
     onResultsChanged?.(
       selfRef,
-      [...searchResults.peek().values()].flatMap((result) => {
-        const app = scoredApps.peek().get(result);
+      [...searchResults.peek().keys()].flatMap((name) => {
+        const app = scoredApps.peek().get(name);
         if (!app) return [];
 
-        return [
-          {
-            data: app.data,
-            score: app.score,
-          },
-        ];
+        return [app.data];
       }),
     );
   };
@@ -136,11 +128,15 @@ export const AppSearch = (props: AppSearchProps) => {
 
         selfRef = self;
 
-        self.set_sort_func(
-          (a, b) =>
-            (scoredApps.peek().get(b.get_name())?.score ?? 0) -
-            (scoredApps.peek().get(a.get_name())?.score ?? 0),
-        );
+        self.set_sort_func((a, b) => {
+          const currentSearchResults = searchResults.peek();
+          const aPosition =
+            currentSearchResults.get(a.get_name()) ?? Number.MAX_SAFE_INTEGER;
+          const bPosition =
+            currentSearchResults.get(b.get_name()) ?? Number.MAX_SAFE_INTEGER;
+
+          return aPosition - bPosition;
+        });
       }}
       class={cx("bg-transparent", classOverride)}
       {...restProps}
