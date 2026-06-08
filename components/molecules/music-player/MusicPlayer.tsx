@@ -1,4 +1,5 @@
 import Mpris from "gi://AstalMpris";
+import Gio from "gi://Gio";
 import Pango from "gi://Pango";
 import {
   createBinding,
@@ -111,17 +112,15 @@ const MusicPlayerBox = (props: MusicPlayerBoxProps) => {
         vexpand={false}
       >
         <With value={coverArt}>
-          {(coverArt) =>
-            coverArt ? (
-              <image
-                class="bg-gray-500 min-w-14 min-h-14 rounded-lg shadow-sm"
-                file={coverArt}
-                overflow={Gtk.Overflow.HIDDEN}
-              />
-            ) : (
-              <box class="bg-gray-500 min-w-14 min-h-14 rounded-lg" />
-            )
-          }
+          {(coverArt) => (
+            <box
+              class="bg-gray-500 rounded-lg shadow-sm"
+              css={getCoverArtStylesheet(coverArt)}
+              heightRequest={56}
+              overflow={Gtk.Overflow.HIDDEN}
+              widthRequest={56}
+            />
+          )}
         </With>
       </box>
       <box
@@ -204,4 +203,12 @@ const MusicPlayerBox = (props: MusicPlayerBoxProps) => {
       </box>
     </box>
   );
+};
+
+const getCoverArtStylesheet = (coverArt: string): string => {
+  if (!coverArt) return "";
+
+  const uri = Gio.File.new_for_path(coverArt).get_uri();
+
+  return `background-image: url("${uri}"); background-position: center; background-repeat: no-repeat; background-size: cover;`;
 };
