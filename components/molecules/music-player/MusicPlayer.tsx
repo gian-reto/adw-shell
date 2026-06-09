@@ -1,14 +1,8 @@
 import Mpris from "gi://AstalMpris";
+
 import Gio from "gi://Gio";
 import Pango from "gi://Pango";
-import {
-  createBinding,
-  createComputed,
-  createState,
-  onCleanup,
-  onMount,
-  With,
-} from "ags";
+import { createBinding, createComputed, With } from "ags";
 import { Gtk } from "ags/gtk4";
 import { cx } from "../../../util/cx";
 import type { GtkBoxProps } from "../../../widgets/GtkBox";
@@ -20,48 +14,43 @@ export const MusicPlayer = (props: MusicPlayerProps) => {
   const mpris = Mpris.get_default();
 
   // State
-  const [currentPlayer, setCurrentPlayer] = createState<
-    Mpris.Player | undefined
-  >(undefined);
+  const players = createBinding(mpris, "players");
+  const currentPlayer = createComputed(
+    () =>
+      players()
+        .flatMap((player) => {
+          const available = createBinding(player, "available");
+          const canControl = createBinding(player, "canControl");
 
-  // Handlers
-  const onPlayersChanged = () => {
-    const availablePlayers = mpris
-      .get_players()
-      .filter((player) => player.available && player.canControl);
+          if (!available() || !canControl()) return [];
 
-    const player =
-      availablePlayers.find(
-        (player) => player.playbackStatus === Mpris.PlaybackStatus.PLAYING,
-      ) ??
-      availablePlayers.find(
-        (player) => player.playbackStatus === Mpris.PlaybackStatus.PAUSED,
-      );
+          const playbackStatus = createBinding(player, "playbackStatus");
 
-    if (player) {
-      if (player !== currentPlayer.peek()) {
-        setCurrentPlayer(player);
-      }
-    } else {
-      setCurrentPlayer(undefined);
-    }
-  };
+          return [
+            {
+              player,
+              playbackStatus: playbackStatus(),
+            },
+          ];
+        })
+        .sort((a, b) => {
+          const getPriority = (status: Mpris.PlaybackStatus) => {
+            switch (status) {
+              case Mpris.PlaybackStatus.PLAYING:
+                return 0;
 
-  // Subscribe to player changes.
-  const notifyPlayersHandlerId = mpris.connect(
-    "notify::players",
-    onPlayersChanged,
+              case Mpris.PlaybackStatus.PAUSED:
+                return 1;
+
+              case Mpris.PlaybackStatus.STOPPED:
+                return 2;
+            }
+          };
+
+          return getPriority(a.playbackStatus) - getPriority(b.playbackStatus);
+        })
+        .at(0)?.player,
   );
-
-  // Lifecycle
-  onMount(() => {
-    // Initially set the player state.
-    onPlayersChanged();
-  });
-
-  onCleanup(() => {
-    mpris.disconnect(notifyPlayersHandlerId);
-  });
 
   return (
     <box
