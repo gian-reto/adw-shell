@@ -119,6 +119,7 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
                 onNotifyText={(self) => setEntryText(self.get_text() || "")}
               />
               <AppGrid
+                canFocus={launcherMode.as((value) => value === "app-grid")}
                 revealChild={launcherMode.as((value) => value === "app-grid")}
                 window={value}
                 onItemClicked={(_source, app) => {

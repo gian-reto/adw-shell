@@ -5,8 +5,8 @@ import {
   createBinding,
   createComputed,
   createState,
-  For,
   onCleanup,
+  With,
 } from "ags";
 import { Gtk } from "ags/gtk4";
 import { cx } from "../../../../util/cx";
@@ -42,6 +42,7 @@ export const AppSearch = (props: AppSearchProps) => {
 
   // Constants
   const MAX_RESULTS = 6;
+  const resultSlots = Array.from({ length: MAX_RESULTS }, (_, index) => index);
   const apps = new Apps.Apps({
     categoriesMultiplier: 0,
     descriptionMultiplier: 0.25,
@@ -65,7 +66,7 @@ export const AppSearch = (props: AppSearchProps) => {
     { waitForMs: 300, immediate: true, resetCooldown: false },
   );
 
-  // Subscribe to search term changes and debounce them
+  // Subscribe to search term changes and debounce them.
   const searchTermUnsubscriber = searchTerm.subscribe(() => {
     updateDebouncedSearchTerm(searchTerm.peek());
   });
@@ -95,30 +96,30 @@ export const AppSearch = (props: AppSearchProps) => {
           .map((app, index) => [app.data.name, index] as const),
       ),
   );
+  const orderedSearchResults = createComputed(() => {
+    const currentScoredApps = scoredApps();
+
+    return [...searchResults().keys()].flatMap((name) => {
+      const app = currentScoredApps.get(name);
+      if (!app) return [];
+
+      return [app.data];
+    });
+  });
 
   // Handlers
-  const onSearchResultsChanged = () => {
-    selfRef.invalidate_sort();
-
-    onResultsChanged?.(
-      selfRef,
-      [...searchResults.peek().keys()].flatMap((name) => {
-        const app = scoredApps.peek().get(name);
-        if (!app) return [];
-
-        return [app.data];
-      }),
-    );
+  const onOrderedSearchResultsChanged = () => {
+    onResultsChanged?.(selfRef, orderedSearchResults.peek());
   };
 
-  const searchResultsUnsubscriber = searchResults.subscribe(
-    onSearchResultsChanged,
+  const orderedSearchResultsUnsubscriber = orderedSearchResults.subscribe(
+    onOrderedSearchResultsChanged,
   );
 
   // Lifecycle
   onCleanup(() => {
     searchTermUnsubscriber();
-    searchResultsUnsubscriber();
+    orderedSearchResultsUnsubscriber();
   });
 
   return (
@@ -127,51 +128,47 @@ export const AppSearch = (props: AppSearchProps) => {
         $?.(self);
 
         selfRef = self;
-
-        self.set_sort_func((a, b) => {
-          const currentSearchResults = searchResults.peek();
-          const aPosition =
-            currentSearchResults.get(a.get_name()) ?? Number.MAX_SAFE_INTEGER;
-          const bPosition =
-            currentSearchResults.get(b.get_name()) ?? Number.MAX_SAFE_INTEGER;
-
-          return aPosition - bPosition;
-        });
       }}
       class={cx("bg-transparent", classOverride)}
       {...restProps}
     >
-      <For each={appsList}>
-        {(app) => (
+      {resultSlots.map((index) => {
+        const app = createComputed(() => orderedSearchResults()[index]);
+        const visible = createComputed(() => app() !== undefined);
+
+        return (
           <Gtk.ListBoxRow
             class="bg-transparent p-0"
             focusable={false}
-            name={app.name}
+            name={`search-result-${index}`}
           >
-            <revealer
-              focusable={false}
-              revealChild={searchResults.as((value) => value.has(app.name))}
-            >
-              <SearchResult
-                app={app}
-                focusable={true}
-                window={window}
-                onClicked={(self) => {
-                  onResultClicked?.(self, app);
+            <revealer focusable={false} revealChild={visible}>
+              <With value={app}>
+                {(value) => (
+                  <SearchResult
+                    app={value}
+                    focusable={visible}
+                    window={window}
+                    onClicked={(self) => {
+                      if (!value) return;
 
-                  setClickCount((count) => count + 1);
-                }}
-              />
+                      onResultClicked?.(self, value);
+
+                      setClickCount((count) => count + 1);
+                    }}
+                  />
+                )}
+              </With>
             </revealer>
           </Gtk.ListBoxRow>
-        )}
-      </For>
+        );
+      })}
     </Gtk.ListBox>
   );
 };
 
 type SearchResultProps = GtkButtonProps & {
-  readonly app: Apps.Application;
+  readonly app: Apps.Application | undefined;
   /**
    * Reference of the parent window.
    */
@@ -181,6 +178,24 @@ type SearchResultProps = GtkButtonProps & {
 export const SearchResult = (props: SearchResultProps) => {
   // Props
   const { app, class: classOverride, window, ...restProps } = props;
+
+  // Render a skeleton box if `app` is `undefined`.
+  if (!app) {
+    return (
+      <button
+        class={cx(
+          "bg-transparent px-0 py-0 rounded-2xl hover:bg-gray-950",
+          classOverride,
+        )}
+        {...restProps}
+      >
+        <box class="space-x-1">
+          <box class="min-w-20 min-h-20" />
+          <box class="min-w-80 min-h-20" />
+        </box>
+      </button>
+    );
+  }
 
   // Constants
   const icon = getIconFromNameOrPath(app.iconName, window, 64);
