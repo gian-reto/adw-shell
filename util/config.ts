@@ -24,7 +24,7 @@ const CONFIG_PATH = `${CONFIG_DIR}/config.json`;
 
 const DEFAULTS: Config = {
   commands: {
-    "log-out": ["hyprctl", "dispatch", "exit"],
+    "log-out": ["hyprctl", "dispatch", "hl.dsp.exit()"],
     lock: ["hyprlock"],
     restart: ["systemctl", "reboot"],
     screenshot: ["grimblast", "--notify", "--freeze", "copy", "area"],

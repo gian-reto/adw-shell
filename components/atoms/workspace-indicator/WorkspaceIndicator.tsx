@@ -60,7 +60,10 @@ const Item = ({ workspaceId }: WorkspaceIndicatorItemProps) => {
       valign={Gtk.Align.CENTER}
       vexpand={false}
       onClicked={() => {
-        hyprland.message_async(`dispatch workspace ${workspaceId}`, null);
+        hyprland.message_async(
+          `dispatch hl.dsp.focus({ workspace = ${workspaceId} })`,
+          null,
+        );
       }}
     />
   );
