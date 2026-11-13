@@ -1,23 +1,23 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.5/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": false
+    "useIgnoreFile": true
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!@girs/**/*", "!/nix/store"]
+    "includes": ["**", "!!**/.direnv", "!!**/node_modules", "!!**/@girs"]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space"
   },
-  "assist": { "actions": { "recommended": true }, "enabled": true },
+  "assist": { "actions": { "preset": "recommended" }, "enabled": true },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "a11y": {
         "noLabelWithoutControl": "off",
         "useButtonType": "off"
@@ -47,5 +47,23 @@
       "quoteStyle": "double",
       "jsxQuoteStyle": "double"
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["theme/**/*.scss"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnknownProperty": {
+              "level": "error",
+              "options": {
+                "ignore": ["-gtk-icon-size", "-gtk-icon-style"]
+              }
+            },
+            "noUnknownTypeSelector": "off"
+          }
+        }
+      }
+    }
+  ]
 }

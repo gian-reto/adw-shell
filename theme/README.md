@@ -4,6 +4,10 @@ The `/theme` directory contains all SCSS styles of the entire shell. At the core
 
 IMPORTANT: This stylesheet is used in GTK, so it's NOT always the same as regular CSS / Sass! Some properties are not implemented in GTK, because they do not make sense in a GTK context (e.g. `flex`). For example, sizing or aligning components in GTK is done directly in JSX using component properties like `halign`, `valign`, `hexpand`, `vexpand`, etc., NOT CSS. The avaliable CSS properties are listed in the [GTK 4 CSS Properties documentation](https://docs.gtk.org/gtk4/css-properties.html). Before adding a style property to some CSS file, check first if it is actually supported by GTK.
 
+## Linting
+
+Biome validates CSS against browser standards, not GTK. For `theme/**/*.scss`, `biome.json` disables `noUnknownTypeSelector` because GTK uses its own CSS node names, and allows the supported `-gtk-icon-size` and `-gtk-icon-style` properties. Other property checks, lint rules, and formatting remain enabled.
+
 ## File Structure
 
 - `/theme/base/<theme-name>.scss`: Contains a file for each usable theme, each of which contains the base design tokens for the respective theme as CSS variables.

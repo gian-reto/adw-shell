@@ -42,8 +42,17 @@ $transition-timing-functions: (
 );
 
 .transition {
-  transition-property: background-color, border-color, caret-color, color,
-    outline-color, text-decoration-color, opacity, box-shadow, transform, filter;
+  transition-property:
+    background-color,
+    border-color,
+    caret-color,
+    color,
+    outline-color,
+    text-decoration-color,
+    opacity,
+    box-shadow,
+    transform,
+    filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
