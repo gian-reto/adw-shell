@@ -1,8 +1,9 @@
 import Apps from "gi://AstalApps";
-import { createComputed, createState, With } from "ags";
+import { createComputed, createState, onCleanup, With } from "ags";
 import { Astal, Gtk } from "ags/gtk4";
 import { launch } from "../../../util/application";
 import { cx } from "../../../util/cx";
+import { debounce } from "../../../util/debounce";
 import { unreachable } from "../../../util/unreachable";
 import {
   PopupWindow,
@@ -32,6 +33,7 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
     Apps.Application | undefined
   >(undefined);
   const [entryText, setEntryText] = createState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = createState("");
   const entryDirty = createComputed(() => entryText() !== "");
   const launcherMode = createComputed(() => {
     if (entryText() === "") {
@@ -53,6 +55,19 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
     entryRef.select_region(0, -1);
     entryRef.grab_focus();
   };
+
+  const updateDebouncedSearchTerm = debounce(
+    (term: string) => setDebouncedSearchTerm(term),
+    {
+      immediate: true,
+      resetCooldown: true,
+      trailing: true,
+      waitForMs: 300,
+    },
+  );
+
+  // Lifecycle
+  onCleanup(() => updateDebouncedSearchTerm.cancel());
 
   return (
     <PopupWindow
@@ -107,6 +122,8 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
                       break;
 
                     case "app-search":
+                      // Updating the term synchronously refreshes the top result.
+                      updateDebouncedSearchTerm.flush();
                       launch(topAppSearchResult.peek());
                       break;
 
@@ -116,7 +133,11 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
 
                   close();
                 }}
-                onNotifyText={(self) => setEntryText(self.get_text() || "")}
+                onNotifyText={(self) => {
+                  const text = self.get_text() || "";
+                  setEntryText(text);
+                  updateDebouncedSearchTerm(text);
+                }}
               />
               <AppGrid
                 canFocus={launcherMode.as((value) => value === "app-grid")}
@@ -138,7 +159,7 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
                   vexpand={false}
                 >
                   <AppSearch
-                    searchTerm={entryText}
+                    searchTerm={debouncedSearchTerm}
                     visible={launcherMode.as((value) => value === "app-search")}
                     window={value}
                     onResultClicked={(_source, app) => {

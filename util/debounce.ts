@@ -1,8 +1,8 @@
-import type AstalIO from "gi://AstalIO";
 import { timeout } from "ags/time";
 
 /**
- * Returns a debounced version of the given function `fn`.
+ * Returns a debounced version of the given function `fn`. Call `flush()` to
+ * immediately execute a pending call, or `cancel()` to discard it.
  */
 export const debounce = <
   F extends (
@@ -11,11 +11,6 @@ export const debounce = <
 >(
   fn: F,
   options: {
-    /**
-     * The number of milliseconds to wait between executions of `fn`, if it's
-     * called again during cooldown.
-     */
-    readonly waitForMs: number;
     /**
      * Whether to execute `fn` immediately when it's called for the first time.
      * Defaults to `true`.
@@ -26,21 +21,51 @@ export const debounce = <
      * Defaults to `true`.
      */
     readonly resetCooldown?: boolean;
+    /**
+     * Whether to execute the latest pending call after cooldown. Defaults to
+     * `true`.
+     */
+    readonly trailing?: boolean;
+    /**
+     * The number of milliseconds to wait between executions of `fn`, if it's
+     * called again during cooldown.
+     */
+    readonly waitForMs: number;
   },
-): ((...args: Parameters<F>) => void) => {
-  const { waitForMs, immediate = true, resetCooldown = true } = options;
+): ((...args: Parameters<F>) => void) & {
+  readonly flush: () => void;
+  readonly cancel: () => void;
+} => {
+  const {
+    waitForMs,
+    immediate = true,
+    resetCooldown = true,
+    trailing = true,
+  } = options;
 
-  let timer: AstalIO.Time | undefined;
+  let timer: ReturnType<typeof timeout> | undefined;
   let lastArgs: Parameters<F> | undefined;
 
-  const later = () => {
-    timer = undefined;
-    if (!immediate) {
-      fn(...(lastArgs! as Parameters<F>));
+  const invokePending = () => {
+    const args = lastArgs;
+    lastArgs = undefined;
+
+    if (args !== undefined) {
+      fn(...(args as Parameters<F>));
     }
   };
 
-  return (...args: Parameters<F>): void => {
+  const later = () => {
+    timer = undefined;
+
+    if (trailing) {
+      invokePending();
+    } else {
+      lastArgs = undefined;
+    }
+  };
+
+  const debounced = (...args: Parameters<F>): void => {
     lastArgs = args;
 
     const callNow = immediate && timer === undefined;
@@ -51,7 +76,21 @@ export const debounce = <
     }
 
     if (callNow) {
-      fn(...args);
+      invokePending();
     }
   };
+
+  const flush = () => {
+    timer?.cancel();
+    timer = undefined;
+    invokePending();
+  };
+
+  const cancel = () => {
+    timer?.cancel();
+    timer = undefined;
+    lastArgs = undefined;
+  };
+
+  return Object.assign(debounced, { flush, cancel });
 };

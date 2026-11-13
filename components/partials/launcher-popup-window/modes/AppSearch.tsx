@@ -10,7 +10,6 @@ import {
 } from "ags";
 import { Gtk } from "ags/gtk4";
 import { cx } from "../../../../util/cx";
-import { debounce } from "../../../../util/debounce";
 import { getIconFromNameOrPath } from "../../../../util/icon";
 import type { GtkButtonProps } from "../../../../widgets/GtkButton";
 import type { GtkListBoxProps } from "../../../../widgets/GtkListBox";
@@ -57,26 +56,14 @@ export const AppSearch = (props: AppSearchProps) => {
 
   // State
   const [clickCount, setClickCount] = createState(0);
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = createState("");
   const appsList = createBinding(apps, "list");
-
-  // Debounced search term update.
-  const updateDebouncedSearchTerm = debounce(
-    (term: string) => setDebouncedSearchTerm(term),
-    { waitForMs: 300, immediate: true, resetCooldown: false },
-  );
-
-  // Subscribe to search term changes and debounce them.
-  const searchTermUnsubscriber = searchTerm.subscribe(() => {
-    updateDebouncedSearchTerm(searchTerm.peek());
-  });
 
   const orderedSearchResults = createComputed(() => {
     // Recompute when the application list or launcher usage changes.
     appsList();
     clickCount();
 
-    const term = debouncedSearchTerm();
+    const term = searchTerm();
 
     // Astal's single-character queries can retain negative-scoring non-matches.
     return apps
@@ -96,7 +83,6 @@ export const AppSearch = (props: AppSearchProps) => {
 
   // Lifecycle
   onCleanup(() => {
-    searchTermUnsubscriber();
     orderedSearchResultsUnsubscriber();
   });
 
