@@ -1,3 +1,4 @@
 .direnv
+.temp/
 node_modules/
 @girs/
