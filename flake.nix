@@ -22,6 +22,32 @@
     forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
     pkgsFor = system: nixpkgs.legacyPackages.${system};
 
+    agsFor = system: let
+      agsPackage = ags.packages.${system}.default;
+    in
+      agsPackage.overrideAttrs (previous: {
+        passthru =
+          (previous.passthru or {})
+          // {
+            # Reuse AGS's locked npm dependencies, exposing only its TypeScript compiler and SDK.
+            typescript = agsPackage.jsPackage.overrideAttrs (_: {
+              name = "ags-typescript";
+              inherit (agsPackage.jsPackage) npmDeps;
+
+              installPhase = ''
+                runHook preInstall
+
+                mkdir -p $out/lib/node_modules $out/bin
+                cp -r node_modules/typescript $out/lib/node_modules/
+                ln -s $out/lib/node_modules/typescript/bin/tsc $out/bin/tsc
+                ln -s $out/lib/node_modules/typescript/bin/tsserver $out/bin/tsserver
+
+                runHook postInstall
+              '';
+            });
+          };
+      });
+
     mkExtraPackagesFor = system: let
       pkgs = pkgsFor system;
 
@@ -57,7 +83,7 @@
         nativeBuildInputs = with pkgs; [
           wrapGAppsHook4
           gobject-introspection
-          ags.packages.${system}.default
+          (agsFor system)
           makeWrapper
         ];
 
@@ -81,15 +107,16 @@
         '';
       };
 
-      ags = ags.packages.${system}.default;
+      ags = agsFor system;
     };
 
     mkDevShellFor = system: let
       pkgs = pkgsFor system;
-      agsPackage = ags.packages.${system}.default.override {
+      agsPackage = (agsFor system).override {
         inherit extraPackages;
       };
       extraPackages = mkExtraPackagesFor system;
+      typescript = agsPackage.typescript;
     in {
       default = pkgs.mkShell {
         buildInputs = [
@@ -97,13 +124,14 @@
           pkgs.biome
           pkgs.dart-sass
           pkgs.nodejs
-          pkgs.typescript
+          typescript
         ];
 
         shellHook = ''
           mkdir -p node_modules
           rm -f node_modules/ags
           ln -sf ${agsPackage}/share/ags/js node_modules/ags
+          ln -sfn ${typescript}/lib/node_modules/typescript node_modules/typescript
         '';
       };
     };
