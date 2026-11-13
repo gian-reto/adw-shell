@@ -45,11 +45,11 @@ export const AppSearch = (props: AppSearchProps) => {
   const resultSlots = Array.from({ length: MAX_RESULTS }, (_, index) => index);
   const apps = new Apps.Apps({
     categoriesMultiplier: 0,
-    descriptionMultiplier: 0.25,
+    descriptionMultiplier: 0,
     entryMultiplier: 0,
-    executableMultiplier: 0.75,
-    keywordsMultiplier: 0.75,
-    nameMultiplier: 2.5,
+    executableMultiplier: 0,
+    keywordsMultiplier: 0,
+    nameMultiplier: 1,
   });
 
   // Refs
@@ -71,40 +71,18 @@ export const AppSearch = (props: AppSearchProps) => {
     updateDebouncedSearchTerm(searchTerm.peek());
   });
 
-  const scoredApps = createComputed(() => {
-    // Recompute when `clickCount` changes, to update the order based on frequency.
+  const orderedSearchResults = createComputed(() => {
+    // Recompute when the application list or launcher usage changes.
+    appsList();
     clickCount();
 
-    return new Map(
-      appsList().map((app) => [
-        app.name,
-        {
-          data: app,
-          score: apps.fuzzy_score(debouncedSearchTerm(), app),
-        },
-      ]),
-    );
-  });
-  const searchResults = createComputed(
-    () =>
-      new Map(
-        [...scoredApps().values()]
-          .sort((a, b) => b.score - a.score)
-          .filter((app) => app.score > 0)
-          .slice(0, MAX_RESULTS)
-          .sort((a, b) => b.data.frequency - a.data.frequency)
-          .map((app, index) => [app.data.name, index] as const),
-      ),
-  );
-  const orderedSearchResults = createComputed(() => {
-    const currentScoredApps = scoredApps();
+    const term = debouncedSearchTerm();
 
-    return [...searchResults().keys()].flatMap((name) => {
-      const app = currentScoredApps.get(name);
-      if (!app) return [];
-
-      return [app.data];
-    });
+    // Astal's single-character queries can retain negative-scoring non-matches.
+    return apps
+      .fuzzy_query(term)
+      .filter((app) => apps.fuzzy_score(term, app) > 0)
+      .slice(0, MAX_RESULTS);
   });
 
   // Handlers
