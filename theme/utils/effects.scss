@@ -16,6 +16,16 @@ $shadows: (
 
 $default-shadow: "0 1px 3px 0 rgb(from var(--local-shadow-color, rgb(0, 0, 0)) r g b / calc(alpha - 85%)), 0 1px 2px -1px rgb(from var(--local-shadow-color, rgb(0, 0, 0)) r g b / calc(alpha - 85%))";
 
+$blurs: (
+  "xs": 4px,
+  "sm": 8px,
+  "md": 12px,
+  "lg": 16px,
+  "xl": 24px,
+  "2xl": 40px,
+  "3xl": 64px,
+);
+
 $opacities: (
   "0": 0,
   "5": 0.05,
@@ -87,6 +97,32 @@ $opacities: (
 
   .checked\:shadow-#{$key}:checked {
     box-shadow: unquote($value);
+  }
+}
+
+@each $key, $value in $blurs {
+  .backdrop-blur-#{$key} {
+    backdrop-filter: blur($value);
+  }
+
+  .hover\:backdrop-blur-#{$key}:hover {
+    backdrop-filter: blur($value);
+  }
+
+  .focus\:backdrop-blur-#{$key}:focus {
+    backdrop-filter: blur($value);
+  }
+
+  .active\:backdrop-blur-#{$key}:active {
+    backdrop-filter: blur($value);
+  }
+
+  .disabled\:backdrop-blur-#{$key}:disabled {
+    backdrop-filter: blur($value);
+  }
+
+  .checked\:backdrop-blur-#{$key}:checked {
+    backdrop-filter: blur($value);
   }
 }
 

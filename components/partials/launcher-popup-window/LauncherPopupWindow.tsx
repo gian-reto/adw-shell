@@ -91,7 +91,7 @@ export const LauncherPopupWindow = (props: LauncherPopupWindowProps) => {
         {(value) =>
           value && (
             <box
-              class="bg-black/80 p-5 rounded-3xl"
+              class="backdrop-blur-md bg-black/80 p-5 rounded-3xl"
               halign={Gtk.Align.CENTER}
               hexpand={false}
               orientation={Gtk.Orientation.VERTICAL}
